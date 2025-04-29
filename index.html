@@ -1,0 +1,1449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Beat Plan Selector with Master File</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prop-types/15.8.1/prop-types.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+  <script src="https://unpkg.com/papaparse@latest/papaparse.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    const initialMasterData = [{"Beat name": "Ballia mod To Ratanpura", "Beat id": "657", "Executive and PSR": "Ajay Singh(SE)(600192)", "EXE ID": "60", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Bhiti to Pipridih", "Beat id": "656", "Executive and PSR": "Ajay Singh(SE)(600192)", "EXE ID": "60", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Chowk to Kopaganj", "Beat id": "658", "Executive and PSR": "Ajay Singh(SE)(600192)", "EXE ID": "60", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Dohrighat to Amila", "Beat id": "547", "Executive and PSR": "Ajay Singh(SE)(600192)", "EXE ID": "60", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Dohrighat to Surajpur", "Beat id": "548", "Executive and PSR": "Ajay Singh(SE)(600192)", "EXE ID": "60", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Madhuban to Dubari", "Beat id": "659", "Executive and PSR": "Ajay Singh(SE)(600192)", "EXE ID": "60", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Madhuban to Maryadpur", "Beat id": "660", "Executive and PSR": "Ajay Singh(SE)(600192)", "EXE ID": "60", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Mohammadabad gohana to Chiriyakot", "Beat id": "428", "Executive and PSR": "Ajay Singh(SE)(600192)", "EXE ID": "60", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Mohammadabad gohana to Devlas", "Beat id": "429", "Executive and PSR": "Ajay Singh(SE)(600192)", "EXE ID": "60", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Mohammadabad gohana to Ranipur", "Beat id": "430", "Executive and PSR": "Ajay Singh(SE)(600192)", "EXE ID": "60", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Adilpur to Ahiraula", "Beat id": "238", "Executive and PSR": "Akhilesh Kumar Shukla(SE)(600208)", "EXE ID": "61", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Adilpur to Atraulia Market", "Beat id": "239", "Executive and PSR": "Akhilesh Kumar Shukla(SE)(600208)", "EXE ID": "61", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Adilpur to Azamgarh shahar", "Beat id": "240", "Executive and PSR": "Akhilesh Kumar Shukla(SE)(600208)", "EXE ID": "61", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Adilpur to Bilariyaganj 1", "Beat id": "648", "Executive and PSR": "Akhilesh Kumar Shukla(SE)(600208)", "EXE ID": "61", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Adilpur to Bilariyaganj 2", "Beat id": "649", "Executive and PSR": "Akhilesh Kumar Shukla(SE)(600208)", "EXE ID": "61", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Adilpur to Devagon", "Beat id": "682", "Executive and PSR": "Akhilesh Kumar Shukla(SE)(600208)", "EXE ID": "61", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Adilpur to Jiynpur", "Beat id": "650", "Executive and PSR": "Akhilesh Kumar Shukla(SE)(600208)", "EXE ID": "61", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Adilpur to Katka 1", "Beat id": "241", "Executive and PSR": "Akhilesh Kumar Shukla(SE)(600208)", "EXE ID": "61", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Adilpur to Katka 2", "Beat id": "242", "Executive and PSR": "Akhilesh Kumar Shukla(SE)(600208)", "EXE ID": "61", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Adilpur to Lalganj", "Beat id": "624", "Executive and PSR": "Akhilesh Kumar Shukla(SE)(600208)", "EXE ID": "61", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Adilpur to Manjhari", "Beat id": "651", "Executive and PSR": "Akhilesh Kumar Shukla(SE)(600208)", "EXE ID": "61", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Adilpur to Martinganj", "Beat id": "623", "Executive and PSR": "Akhilesh Kumar Shukla(SE)(600208)", "EXE ID": "61", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Adilpur to Mehnagar", "Beat id": "625", "Executive and PSR": "Akhilesh Kumar Shukla(SE)(600208)", "EXE ID": "61", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Adilpur to Nevada", "Beat id": "243", "Executive and PSR": "Akhilesh Kumar Shukla(SE)(600208)", "EXE ID": "61", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Adilpur to Nizambad 1", "Beat id": "652", "Executive and PSR": "Akhilesh Kumar Shukla(SE)(600208)", "EXE ID": "61", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Adilpur To Pawai", "Beat id": "244", "Executive and PSR": "Akhilesh Kumar Shukla(SE)(600208)", "EXE ID": "61", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Adilpur to Senpur", "Beat id": "245", "Executive and PSR": "Akhilesh Kumar Shukla(SE)(600208)", "EXE ID": "61", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Adilpur to Sikandarpur", "Beat id": "246", "Executive and PSR": "Akhilesh Kumar Shukla(SE)(600208)", "EXE ID": "61", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Adilpur to Sikandarpur 2", "Beat id": "247", "Executive and PSR": "Akhilesh Kumar Shukla(SE)(600208)", "EXE ID": "61", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Bhadaura to revtipur", "Beat id": "564", "Executive and PSR": "Amit Kumar Singh(SE)(600179)", "EXE ID": "63", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Durlabhpur to Jalkhaniya", "Beat id": "549", "Executive and PSR": "Amit Kumar Singh(SE)(600179)", "EXE ID": "63", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Durlabhpur to sarsena", "Beat id": "570", "Executive and PSR": "Amit Kumar Singh(SE)(600179)", "EXE ID": "63", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Durlapur to shikhidi", "Beat id": "569", "Executive and PSR": "Amit Kumar Singh(SE)(600179)", "EXE ID": "63", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Ghazipur to Karnda", "Beat id": "634", "Executive and PSR": "Amit Kumar Singh(SE)(600179)", "EXE ID": "63", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Mohammadabad to bhavrkol", "Beat id": "431", "Executive and PSR": "Amit Kumar Singh(SE)(600179)", "EXE ID": "63", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Mohammadabad to nonhra", "Beat id": "432", "Executive and PSR": "Amit Kumar Singh(SE)(600179)", "EXE ID": "63", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Saidpur to Chochkpur", "Beat id": "466", "Executive and PSR": "Amit Kumar Singh(SE)(600179)", "EXE ID": "63", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Saidpur To kotisha", "Beat id": "467", "Executive and PSR": "Amit Kumar Singh(SE)(600179)", "EXE ID": "63", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Bah D to Kewda", "Beat id": "567", "Executive and PSR": "Arun Yadav(SE)(600213)", "EXE ID": "66", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Bah D to Naraiyanpur", "Beat id": "568", "Executive and PSR": "Arun Yadav(SE)(600213)", "EXE ID": "66", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Balia to Alawalpur", "Beat id": "882", "Executive and PSR": "Arun Yadav(SE)(600213)", "EXE ID": "66", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Ballia Market", "Beat id": "293", "Executive and PSR": "Arun Yadav(SE)(600213)", "EXE ID": "66", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Ballia to Chitbadagaon", "Beat id": "294", "Executive and PSR": "Arun Yadav(SE)(600213)", "EXE ID": "66", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Ballia to Sikandarpur", "Beat id": "295", "Executive and PSR": "Arun Yadav(SE)(600213)", "EXE ID": "66", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Ratsad To Ekail", "Beat id": "456", "Executive and PSR": "Arun Yadav(SE)(600213)", "EXE ID": "66", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Ratsad to Pachkhoda", "Beat id": "571", "Executive and PSR": "Arun Yadav(SE)(600213)", "EXE ID": "66", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Ratsar to Pur", "Beat id": "643", "Executive and PSR": "Arun Yadav(SE)(600213)", "EXE ID": "66", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Shankarpur", "Beat id": "638", "Executive and PSR": "Arun Yadav(SE)(600213)", "EXE ID": "66", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Baburi", "Beat id": "468", "Executive and PSR": "Manish Kumar Vishwakarma(SE)(600215)", "EXE ID": "79", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Ben Sahabganj", "Beat id": "690", "Executive and PSR": "Manish Kumar Vishwakarma(SE)(600215)", "EXE ID": "79", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "chahaniya", "Beat id": "619", "Executive and PSR": "Manish Kumar Vishwakarma(SE)(600215)", "EXE ID": "79", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Chakia", "Beat id": "689", "Executive and PSR": "Manish Kumar Vishwakarma(SE)(600215)", "EXE ID": "79", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Chandauli", "Beat id": "469", "Executive and PSR": "Manish Kumar Vishwakarma(SE)(600215)", "EXE ID": "79", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Dangsanj to Pandeypur", "Beat id": "616", "Executive and PSR": "Manish Kumar Vishwakarma(SE)(600215)", "EXE ID": "79", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Kamalpur", "Beat id": "618", "Executive and PSR": "Manish Kumar Vishwakarma(SE)(600215)", "EXE ID": "79", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Kamalpur to Dhanapur", "Beat id": "617", "Executive and PSR": "Manish Kumar Vishwakarma(SE)(600215)", "EXE ID": "79", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Saiyadraja", "Beat id": "470", "Executive and PSR": "Manish Kumar Vishwakarma(SE)(600215)", "EXE ID": "79", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Sakaldiha", "Beat id": "620", "Executive and PSR": "Manish Kumar Vishwakarma(SE)(600215)", "EXE ID": "79", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Zamania To Baruin", "Beat id": "519", "Executive and PSR": "Manish Kumar Vishwakarma(SE)(600215)", "EXE ID": "79", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Zamania To Suhwal", "Beat id": "520", "Executive and PSR": "Manish Kumar Vishwakarma(SE)(600215)", "EXE ID": "79", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Kachhawa Road to Bada Gaon", "Beat id": "393", "Executive and PSR": "Amit Upadhyay(SE)(600269)", "EXE ID": "176", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Kachhawa Road To Chauri Bazar", "Beat id": "394", "Executive and PSR": "Amit Upadhyay(SE)(600269)", "EXE ID": "176", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Kachhawa road to Chunar", "Beat id": "395", "Executive and PSR": "Amit Upadhyay(SE)(600269)", "EXE ID": "176", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Kachhawa road to Dhanupur", "Beat id": "396", "Executive and PSR": "Amit Upadhyay(SE)(600269)", "EXE ID": "176", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Kachhawa road to Dhawakalganj", "Beat id": "397", "Executive and PSR": "Amit Upadhyay(SE)(600269)", "EXE ID": "176", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Kachhawa Road to Gorai bazar", "Beat id": "398", "Executive and PSR": "Amit Upadhyay(SE)(600269)", "EXE ID": "176", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Kachhawa road to majhawa", "Beat id": "399", "Executive and PSR": "Amit Upadhyay(SE)(600269)", "EXE ID": "176", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Kachhawa Road to Manda", "Beat id": "400", "Executive and PSR": "Amit Upadhyay(SE)(600269)", "EXE ID": "176", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Kachhawa Road to Mirzapur", "Beat id": "401", "Executive and PSR": "Amit Upadhyay(SE)(600269)", "EXE ID": "176", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Kachhawa road to MohanSarai", "Beat id": "565", "Executive and PSR": "Amit Upadhyay(SE)(600269)", "EXE ID": "176", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Kachhawa Road to Rajpura", "Beat id": "402", "Executive and PSR": "Amit Upadhyay(SE)(600269)", "EXE ID": "176", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Kachhawa Road to Sahganj", "Beat id": "403", "Executive and PSR": "Amit Upadhyay(SE)(600269)", "EXE ID": "176", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
+{"Beat name": "Behajam to Oel", "Beat id": "113", "Executive and PSR": "Ashwani Bajpai(SE)(600232)", "EXE ID": "68", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Gola to Lakhimpur 1", "Beat id": "114", "Executive and PSR": "Ashwani Bajpai(SE)(600232)", "EXE ID": "68", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Gola to Lakhimpur 2", "Beat id": "115", "Executive and PSR": "Ashwani Bajpai(SE)(600232)", "EXE ID": "68", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Gola To Sikandrabad", "Beat id": "116", "Executive and PSR": "Ashwani Bajpai(SE)(600232)", "EXE ID": "68", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Lakhimepur To Kasta", "Beat id": "117", "Executive and PSR": "Ashwani Bajpai(SE)(600232)", "EXE ID": "68", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Lakhimepur To Nimgaun", "Beat id": "118", "Executive and PSR": "Ashwani Bajpai(SE)(600232)", "EXE ID": "68", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Lakhimpur To Aliganj", "Beat id": "120", "Executive and PSR": "Ashwani Bajpai(SE)(600232)", "EXE ID": "68", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Lakhimpur To Amritaganj", "Beat id": "121", "Executive and PSR": "Ashwani Bajpai(SE)(600232)", "EXE ID": "68", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Lakhimpur To Behjam", "Beat id": "122", "Executive and PSR": "Ashwani Bajpai(SE)(600232)", "EXE ID": "68", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Lakhimpur To Nakaha", "Beat id": "123", "Executive and PSR": "Ashwani Bajpai(SE)(600232)", "EXE ID": "68", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Lakhimpur To Sadar", "Beat id": "124", "Executive and PSR": "Ashwani Bajpai(SE)(600232)", "EXE ID": "68", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Lakhimpur To Salarpur", "Beat id": "125", "Executive and PSR": "Ashwani Bajpai(SE)(600232)", "EXE ID": "68", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Maigalganj to Alipur", "Beat id": "810", "Executive and PSR": "Ashwani Bajpai(SE)(600232)", "EXE ID": "68", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Maigalganj to Aurangabad", "Beat id": "709", "Executive and PSR": "Ashwani Bajpai(SE)(600232)", "EXE ID": "68", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "maigalganj to kahimara", "Beat id": "715", "Executive and PSR": "Ashwani Bajpai(SE)(600232)", "EXE ID": "68", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Maigalganj to Makhan Chouraha", "Beat id": "775", "Executive and PSR": "Ashwani Bajpai(SE)(600232)", "EXE ID": "68", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Mitauli_Maigalganj", "Beat id": "126", "Executive and PSR": "Ashwani Bajpai(SE)(600232)", "EXE ID": "68", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Mitholi to madyabazar", "Beat id": "696", "Executive and PSR": "Ashwani Bajpai(SE)(600232)", "EXE ID": "68", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Mohammdi to Barbar", "Beat id": "736", "Executive and PSR": "Ashwani Bajpai(SE)(600232)", "EXE ID": "68", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Mohammdi to J.B ganj", "Beat id": "727", "Executive and PSR": "Ashwani Bajpai(SE)(600232)", "EXE ID": "68", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Mohammdi to Mahesh pur", "Beat id": "717", "Executive and PSR": "Ashwani Bajpai(SE)(600232)", "EXE ID": "68", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Mohammdi to Mahmudpur", "Beat id": "734", "Executive and PSR": "Ashwani Bajpai(SE)(600232)", "EXE ID": "68", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Mohhamdi", "Beat id": "676", "Executive and PSR": "Ashwani Bajpai(SE)(600232)", "EXE ID": "68", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Beniganj To Kothawan 2", "Beat id": "142", "Executive and PSR": "Dharmendra Patel(SE)(600231)", "EXE ID": "72", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Hardoi To Bilgram1", "Beat id": "67", "Executive and PSR": "Dharmendra Patel(SE)(600231)", "EXE ID": "72", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Hardoi To Bilgram2", "Beat id": "68", "Executive and PSR": "Dharmendra Patel(SE)(600231)", "EXE ID": "72", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Hardoi To Madhowganj1", "Beat id": "73", "Executive and PSR": "Dharmendra Patel(SE)(600231)", "EXE ID": "72", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Hardoi To Madhowganj2", "Beat id": "74", "Executive and PSR": "Dharmendra Patel(SE)(600231)", "EXE ID": "72", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Hardoi To Mallawan1", "Beat id": "75", "Executive and PSR": "Dharmendra Patel(SE)(600231)", "EXE ID": "72", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Hardoi To Mallawan2", "Beat id": "76", "Executive and PSR": "Dharmendra Patel(SE)(600231)", "EXE ID": "72", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Sandila To Atrauli", "Beat id": "143", "Executive and PSR": "Dharmendra Patel(SE)(600231)", "EXE ID": "72", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Sandila To Atrauli 2", "Beat id": "144", "Executive and PSR": "Dharmendra Patel(SE)(600231)", "EXE ID": "72", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Sandila To Beniganj", "Beat id": "145", "Executive and PSR": "Dharmendra Patel(SE)(600231)", "EXE ID": "72", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Sandila to Bhatpur", "Beat id": "147", "Executive and PSR": "Dharmendra Patel(SE)(600231)", "EXE ID": "72", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Sandila To Bhatpur 2", "Beat id": "146", "Executive and PSR": "Dharmendra Patel(SE)(600231)", "EXE ID": "72", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Sandila To Gausganj", "Beat id": "148", "Executive and PSR": "Dharmendra Patel(SE)(600231)", "EXE ID": "72", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Sandila To Madar", "Beat id": "149", "Executive and PSR": "Dharmendra Patel(SE)(600231)", "EXE ID": "72", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Sandila To Madar 2", "Beat id": "150", "Executive and PSR": "Dharmendra Patel(SE)(600231)", "EXE ID": "72", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Sandila to Pawaya", "Beat id": "151", "Executive and PSR": "Dharmendra Patel(SE)(600231)", "EXE ID": "72", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Sandila To Pratap Nagar Chauraha", "Beat id": "152", "Executive and PSR": "Dharmendra Patel(SE)(600231)", "EXE ID": "72", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Sandila To Sandi", "Beat id": "80", "Executive and PSR": "Dharmendra Patel(SE)(600231)", "EXE ID": "72", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Allahganj To Jalalabad", "Beat id": "229", "Executive and PSR": "Nivesh Gupta(SE)(600201)", "EXE ID": "81", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Banda", "Beat id": "814", "Executive and PSR": "Nivesh Gupta(SE)(600201)", "EXE ID": "81", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Bilandapur", "Beat id": "813", "Executive and PSR": "Nivesh Gupta(SE)(600201)", "EXE ID": "81", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Gangsara", "Beat id": "811", "Executive and PSR": "Nivesh Gupta(SE)(600201)", "EXE ID": "81", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Hullapur to Asrafpur", "Beat id": "230", "Executive and PSR": "Nivesh Gupta(SE)(600201)", "EXE ID": "81", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Jariyanpur To Kalan", "Beat id": "231", "Executive and PSR": "Nivesh Gupta(SE)(600201)", "EXE ID": "81", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Kant - Sahajahanpur sadar", "Beat id": "227", "Executive and PSR": "Nivesh Gupta(SE)(600201)", "EXE ID": "81", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Maholia to Bahadurpur", "Beat id": "893", "Executive and PSR": "Nivesh Gupta(SE)(600201)", "EXE ID": "81", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Maholia to Baragaon", "Beat id": "880", "Executive and PSR": "Nivesh Gupta(SE)(600201)", "EXE ID": "81", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Maholia to Katiya", "Beat id": "888", "Executive and PSR": "Nivesh Gupta(SE)(600201)", "EXE ID": "81", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Maholia to Pirtala", "Beat id": "925", "Executive and PSR": "Nivesh Gupta(SE)(600201)", "EXE ID": "81", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Nigohi Road to Sahabad Road", "Beat id": "233", "Executive and PSR": "Nivesh Gupta(SE)(600201)", "EXE ID": "81", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Pakadiya Hakim", "Beat id": "812", "Executive and PSR": "Nivesh Gupta(SE)(600201)", "EXE ID": "81", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "sahajanhapur to tilahar", "Beat id": "235", "Executive and PSR": "Nivesh Gupta(SE)(600201)", "EXE ID": "81", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Shahjahanpur to Barenda", "Beat id": "883", "Executive and PSR": "Nivesh Gupta(SE)(600201)", "EXE ID": "81", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Shahjahanpur to Madnapur", "Beat id": "917", "Executive and PSR": "Nivesh Gupta(SE)(600201)", "EXE ID": "81", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Shahjahanpur To Powayan", "Beat id": "234", "Executive and PSR": "Nivesh Gupta(SE)(600201)", "EXE ID": "81", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Sindhauli", "Beat id": "815", "Executive and PSR": "Nivesh Gupta(SE)(600201)", "EXE ID": "81", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Bholagang to Sanda", "Beat id": "192", "Executive and PSR": "Shailesh Kumar Pandey(SE)(600164)", "EXE ID": "90", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Biswa to reusa", "Beat id": "193", "Executive and PSR": "Shailesh Kumar Pandey(SE)(600164)", "EXE ID": "90", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Biswa to sidhauli 1", "Beat id": "194", "Executive and PSR": "Shailesh Kumar Pandey(SE)(600164)", "EXE ID": "90", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Biswa to sidhauli 2", "Beat id": "195", "Executive and PSR": "Shailesh Kumar Pandey(SE)(600164)", "EXE ID": "90", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Biswa to Taidva", "Beat id": "196", "Executive and PSR": "Shailesh Kumar Pandey(SE)(600164)", "EXE ID": "90", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Hargaon To Haidarpur", "Beat id": "153", "Executive and PSR": "Shailesh Kumar Pandey(SE)(600164)", "EXE ID": "90", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Laherpur to Biswa", "Beat id": "197", "Executive and PSR": "Shailesh Kumar Pandey(SE)(600164)", "EXE ID": "90", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Leherpur to Lakhimpur", "Beat id": "162", "Executive and PSR": "Shailesh Kumar Pandey(SE)(600164)", "EXE ID": "90", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Leherpur to Persendi 1", "Beat id": "163", "Executive and PSR": "Shailesh Kumar Pandey(SE)(600164)", "EXE ID": "90", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Leherpur to Persendi 2", "Beat id": "164", "Executive and PSR": "Shailesh Kumar Pandey(SE)(600164)", "EXE ID": "90", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Leherpur to Persendi 3", "Beat id": "165", "Executive and PSR": "Shailesh Kumar Pandey(SE)(600164)", "EXE ID": "90", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Leherpur to Tambour", "Beat id": "166", "Executive and PSR": "Shailesh Kumar Pandey(SE)(600164)", "EXE ID": "90", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Maholi To Bargawa", "Beat id": "182", "Executive and PSR": "Shailesh Kumar Pandey(SE)(600164)", "EXE ID": "90", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Maholi To Bedanpur", "Beat id": "183", "Executive and PSR": "Shailesh Kumar Pandey(SE)(600164)", "EXE ID": "90", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Maholi To Behatgaur", "Beat id": "184", "Executive and PSR": "Shailesh Kumar Pandey(SE)(600164)", "EXE ID": "90", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Maholi To Gursanda", "Beat id": "185", "Executive and PSR": "Shailesh Kumar Pandey(SE)(600164)", "EXE ID": "90", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Maholi To Kaji Kamalpur", "Beat id": "186", "Executive and PSR": "Shailesh Kumar Pandey(SE)(600164)", "EXE ID": "90", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Maholi To Luktha", "Beat id": "187", "Executive and PSR": "Shailesh Kumar Pandey(SE)(600164)", "EXE ID": "90", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Maholi To Nuambarpur", "Beat id": "188", "Executive and PSR": "Shailesh Kumar Pandey(SE)(600164)", "EXE ID": "90", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Maholi To Paperjala", "Beat id": "189", "Executive and PSR": "Shailesh Kumar Pandey(SE)(600164)", "EXE ID": "90", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Maholi To Richahi", "Beat id": "190", "Executive and PSR": "Shailesh Kumar Pandey(SE)(600164)", "EXE ID": "90", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "manpur to biswa", "Beat id": "198", "Executive and PSR": "Shailesh Kumar Pandey(SE)(600164)", "EXE ID": "90", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Masjid To Ganeshpur", "Beat id": "191", "Executive and PSR": "Shailesh Kumar Pandey(SE)(600164)", "EXE ID": "90", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Mehmudabad To Rampur Mathura 1", "Beat id": "199", "Executive and PSR": "Shailesh Kumar Pandey(SE)(600164)", "EXE ID": "90", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Mehmudabad To Rampur Mathura 2", "Beat id": "200", "Executive and PSR": "Shailesh Kumar Pandey(SE)(600164)", "EXE ID": "90", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Mehumdabad to Sidhuli", "Beat id": "201", "Executive and PSR": "Shailesh Kumar Pandey(SE)(600164)", "EXE ID": "90", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Rausa to Tambour", "Beat id": "202", "Executive and PSR": "Shailesh Kumar Pandey(SE)(600164)", "EXE ID": "90", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Rausa to Thangao", "Beat id": "203", "Executive and PSR": "Shailesh Kumar Pandey(SE)(600164)", "EXE ID": "90", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Saraiya Station to Gurdecha M 1", "Beat id": "204", "Executive and PSR": "Shailesh Kumar Pandey(SE)(600164)", "EXE ID": "90", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Saraiya Station to Gurdecha M 2", "Beat id": "205", "Executive and PSR": "Shailesh Kumar Pandey(SE)(600164)", "EXE ID": "90", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Sidhauli to Atariya 1", "Beat id": "167", "Executive and PSR": "Shailesh Kumar Pandey(SE)(600164)", "EXE ID": "90", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Sidhauli to Atariya 2", "Beat id": "168", "Executive and PSR": "Shailesh Kumar Pandey(SE)(600164)", "EXE ID": "90", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Sidhauli to Gondlamau", "Beat id": "169", "Executive and PSR": "Shailesh Kumar Pandey(SE)(600164)", "EXE ID": "90", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Sidhauli to Masterbagh", "Beat id": "170", "Executive and PSR": "Shailesh Kumar Pandey(SE)(600164)", "EXE ID": "90", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Sitapur to keshrigang", "Beat id": "226", "Executive and PSR": "Shailesh Kumar Pandey(SE)(600164)", "EXE ID": "90", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Sitapur to Biswa", "Beat id": "161", "Executive and PSR": "Shailesh Kumar Pandey(SE)(600164)", "EXE ID": "90", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Sitapur To Hargaon 1", "Beat id": "154", "Executive and PSR": "Shailesh Kumar Pandey(SE)(600164)", "EXE ID": "90", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Sitapur To Hargaon 2", "Beat id": "155", "Executive and PSR": "Shailesh Kumar Pandey(SE)(600164)", "EXE ID": "90", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Sitapur To Hazipur 1", "Beat id": "156", "Executive and PSR": "Shailesh Kumar Pandey(SE)(600164)", "EXE ID": "90", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Sitapur To Hazipur 2", "Beat id": "157", "Executive and PSR": "Shailesh Kumar Pandey(SE)(600164)", "EXE ID": "90", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Sitapur To Hempur", "Beat id": "158", "Executive and PSR": "Shailesh Kumar Pandey(SE)(600164)", "EXE ID": "90", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Sitapur to Khairabad", "Beat id": "159", "Executive and PSR": "Shailesh Kumar Pandey(SE)(600164)", "EXE ID": "90", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Sitapur To Ramkot", "Beat id": "160", "Executive and PSR": "Shailesh Kumar Pandey(SE)(600164)", "EXE ID": "90", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "sitapur  to biswa 1", "Beat id": "206", "Executive and PSR": "Shailesh Kumar Pandey(SE)(600164)", "EXE ID": "90", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Machrehta to bhitohra ", "Beat id": "172", "Executive and PSR": "Satyapal(SE)(600142)", "EXE ID": "134", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "machrehta to goriya centre.", "Beat id": "173", "Executive and PSR": "Satyapal(SE)(600142)", "EXE ID": "134", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Mishrikh to kutum nagar 1", "Beat id": "174", "Executive and PSR": "Satyapal(SE)(600142)", "EXE ID": "134", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Mishrikh to kutum nagar 2", "Beat id": "175", "Executive and PSR": "Satyapal(SE)(600142)", "EXE ID": "134", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Mishrikh to machrehta", "Beat id": "176", "Executive and PSR": "Satyapal(SE)(600142)", "EXE ID": "134", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Mishrikh to Sandhna 1", "Beat id": "177", "Executive and PSR": "Satyapal(SE)(600142)", "EXE ID": "134", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Mishrikh to Sandhna 2", "Beat id": "178", "Executive and PSR": "Satyapal(SE)(600142)", "EXE ID": "134", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Namaish to kalli chauraya", "Beat id": "179", "Executive and PSR": "Satyapal(SE)(600142)", "EXE ID": "134", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Namaish to Ramkot 1", "Beat id": "180", "Executive and PSR": "Satyapal(SE)(600142)", "EXE ID": "134", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Namaish to Ramkot 2", "Beat id": "181", "Executive and PSR": "Satyapal(SE)(600142)", "EXE ID": "134", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Badaun to Daherpur", "Beat id": "575", "Executive and PSR": "Pradeep Singh(SE)(600264)", "EXE ID": "157", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Badaun To Kakrala", "Beat id": "539", "Executive and PSR": "Pradeep Singh(SE)(600264)", "EXE ID": "157", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Badaun To Mayoun", "Beat id": "546", "Executive and PSR": "Pradeep Singh(SE)(600264)", "EXE ID": "157", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Badaun to Ujhani", "Beat id": "926", "Executive and PSR": "Pradeep Singh(SE)(600264)", "EXE ID": "157", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Bareily To Bagrain", "Beat id": "540", "Executive and PSR": "Pradeep Singh(SE)(600264)", "EXE ID": "157", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Bareily to Bhauta", "Beat id": "542", "Executive and PSR": "Pradeep Singh(SE)(600264)", "EXE ID": "157", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Bareily to Faridpur to Bhauta", "Beat id": "543", "Executive and PSR": "Pradeep Singh(SE)(600264)", "EXE ID": "157", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Bareily to Hazratpur", "Beat id": "545", "Executive and PSR": "Pradeep Singh(SE)(600264)", "EXE ID": "157", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Bareily to Jagat", "Beat id": "544", "Executive and PSR": "Pradeep Singh(SE)(600264)", "EXE ID": "157", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Bareily To Ram Nagar", "Beat id": "541", "Executive and PSR": "Pradeep Singh(SE)(600264)", "EXE ID": "157", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Saidpur To Bilsi", "Beat id": "522", "Executive and PSR": "Pradeep Singh(SE)(600264)", "EXE ID": "157", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Saidpur To Bisauli", "Beat id": "538", "Executive and PSR": "Pradeep Singh(SE)(600264)", "EXE ID": "157", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Samrer to Dataganj", "Beat id": "521", "Executive and PSR": "Pradeep Singh(SE)(600264)", "EXE ID": "157", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Hardoi To Behta Gokul", "Beat id": "65", "Executive and PSR": "Ashish Mishra(SE)(600169)", "EXE ID": "170", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Hardoi To Bghaoli", "Beat id": "66", "Executive and PSR": "Ashish Mishra(SE)(600169)", "EXE ID": "170", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Hardoi To Dakaipurwa to Pratap Nagar_Arun", "Beat id": "69", "Executive and PSR": "Ashish Mishra(SE)(600169)", "EXE ID": "170", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Hardoi To Gopamau", "Beat id": "70", "Executive and PSR": "Ashish Mishra(SE)(600169)", "EXE ID": "170", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Hardoi To Hardoi", "Beat id": "9", "Executive and PSR": "Ashish Mishra(SE)(600169)", "EXE ID": "170", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Hardoi To Harpalpur", "Beat id": "72", "Executive and PSR": "Ashish Mishra(SE)(600169)", "EXE ID": "170", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Hardoi To Manpur", "Beat id": "77", "Executive and PSR": "Ashish Mishra(SE)(600169)", "EXE ID": "170", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Hardoi To Pali", "Beat id": "78", "Executive and PSR": "Ashish Mishra(SE)(600169)", "EXE ID": "170", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Hardoi To Pihani", "Beat id": "79", "Executive and PSR": "Ashish Mishra(SE)(600169)", "EXE ID": "170", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Hardoi to Rupapur", "Beat id": "586", "Executive and PSR": "Ashish Mishra(SE)(600169)", "EXE ID": "170", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Hardoi To Sadar", "Beat id": "71", "Executive and PSR": "Ashish Mishra(SE)(600169)", "EXE ID": "170", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Hardoi To Sawayajpur1", "Beat id": "81", "Executive and PSR": "Ashish Mishra(SE)(600169)", "EXE ID": "170", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Hardoi To Sawayajpur2", "Beat id": "82", "Executive and PSR": "Ashish Mishra(SE)(600169)", "EXE ID": "170", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Hardoi To Shahabad", "Beat id": "83", "Executive and PSR": "Ashish Mishra(SE)(600169)", "EXE ID": "170", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Hardoi To Siromani_Nagar", "Beat id": "84", "Executive and PSR": "Ashish Mishra(SE)(600169)", "EXE ID": "170", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Hardoi to SromanNagar", "Beat id": "609", "Executive and PSR": "Ashish Mishra(SE)(600169)", "EXE ID": "170", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Kachheliya", "Beat id": "884", "Executive and PSR": "Ashish Mishra(SE)(600169)", "EXE ID": "170", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Pareli", "Beat id": "838", "Executive and PSR": "Ashish Mishra(SE)(600169)", "EXE ID": "170", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Pareli to Kachliya", "Beat id": "859", "Executive and PSR": "Ashish Mishra(SE)(600169)", "EXE ID": "170", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Shahabad to Alamngar", "Beat id": "879", "Executive and PSR": "Ashish Mishra(SE)(600169)", "EXE ID": "170", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Shahabad to Anangpur", "Beat id": "844", "Executive and PSR": "Ashish Mishra(SE)(600169)", "EXE ID": "170", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Shahabad to Firozpur", "Beat id": "856", "Executive and PSR": "Ashish Mishra(SE)(600169)", "EXE ID": "170", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Shahabad to Pihani", "Beat id": "855", "Executive and PSR": "Ashish Mishra(SE)(600169)", "EXE ID": "170", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Shahabad to Siroman Nagar", "Beat id": "840", "Executive and PSR": "Ashish Mishra(SE)(600169)", "EXE ID": "170", "PSR": "", "PSR ID": "", "ASM": "Ankit Shukla"},
+{"Beat name": "Bharaha to Cheonki", "Beat id": "820", "Executive and PSR": "Adarsh Kumar Singh(SE)(600200)", "EXE ID": "58", "PSR": "", "PSR ID": "", "ASM": "Anoop Tiwari"},
+{"Beat name": "Bharaha to Diha", "Beat id": "817", "Executive and PSR": "Adarsh Kumar Singh(SE)(600200)", "EXE ID": "58", "PSR": "", "PSR ID": "", "ASM": "Anoop Tiwari"},
+{"Beat name": "Bharaha to Meja", "Beat id": "818", "Executive and PSR": "Adarsh Kumar Singh(SE)(600200)", "EXE ID": "58", "PSR": "", "PSR ID": "", "ASM": "Anoop Tiwari"},
+{"Beat name": "Bharaha to Tudihar", "Beat id": "819", "Executive and PSR": "Adarsh Kumar Singh(SE)(600200)", "EXE ID": "58", "PSR": "", "PSR ID": "", "ASM": "Anoop Tiwari"},
+{"Beat name": "Phoolpur to Kathara", "Beat id": "674", "Executive and PSR": "Adarsh Kumar Singh(SE)(600200)", "EXE ID": "58", "PSR": "", "PSR ID": "", "ASM": "Anoop Tiwari"},
+{"Beat name": "Phoolpur to Sahson", "Beat id": "673", "Executive and PSR": "Adarsh Kumar Singh(SE)(600200)", "EXE ID": "58", "PSR": "", "PSR ID": "", "ASM": "Anoop Tiwari"},
+{"Beat name": "Phoolpur to Sikandara", "Beat id": "675", "Executive and PSR": "Adarsh Kumar Singh(SE)(600200)", "EXE ID": "58", "PSR": "", "PSR ID": "", "ASM": "Anoop Tiwari"},
+{"Beat name": "Phoolpur to Sujanganj", "Beat id": "821", "Executive and PSR": "Adarsh Kumar Singh(SE)(600200)", "EXE ID": "58", "PSR": "", "PSR ID": "", "ASM": "Anoop Tiwari"},
+{"Beat name": "Amaniganj To Darshan Nagra (Ayodhya)", "Beat id": "264", "Executive and PSR": "Pradeep Verma(SE)(600184)", "EXE ID": "82", "PSR": "", "PSR ID": "", "ASM": "Anoop Tiwari"},
+{"Beat name": "Amaniganj To Haliyapur", "Beat id": "265", "Executive and PSR": "Pradeep Verma(SE)(600184)", "EXE ID": "82", "PSR": "", "PSR ID": "", "ASM": "Anoop Tiwari"},
+{"Beat name": "Amaniganj To Khajurat", "Beat id": "266", "Executive and PSR": "Pradeep Verma(SE)(600184)", "EXE ID": "82", "PSR": "", "PSR ID": "", "ASM": "Anoop Tiwari"},
+{"Beat name": "Amaniganj to Khajurat 1", "Beat id": "822", "Executive and PSR": "Pradeep Verma(SE)(600184)", "EXE ID": "82", "PSR": "", "PSR ID": "", "ASM": "Anoop Tiwari"},
+{"Beat name": "Amaniganj to Khajurat 2", "Beat id": "823", "Executive and PSR": "Pradeep Verma(SE)(600184)", "EXE ID": "82", "PSR": "", "PSR ID": "", "ASM": "Anoop Tiwari"},
+{"Beat name": "Bahadurganj To Tulsampur", "Beat id": "272", "Executive and PSR": "Pradeep Verma(SE)(600184)", "EXE ID": "82", "PSR": "", "PSR ID": "", "ASM": "Anoop Tiwari"},
+{"Beat name": "Bikapur to Maya bazar", "Beat id": "340", "Executive and PSR": "Pradeep Verma(SE)(600184)", "EXE ID": "82", "PSR": "", "PSR ID": "", "ASM": "Anoop Tiwari"},
+{"Beat name": "Bikapur to Maya bazar 2", "Beat id": "828", "Executive and PSR": "Pradeep Verma(SE)(600184)", "EXE ID": "82", "PSR": "", "PSR ID": "", "ASM": "Anoop Tiwari"},
+{"Beat name": "Bikapur to Maya bazar1", "Beat id": "827", "Executive and PSR": "Pradeep Verma(SE)(600184)", "EXE ID": "82", "PSR": "", "PSR ID": "", "ASM": "Anoop Tiwari"},
+{"Beat name": "Bikapur to Amaniganj", "Beat id": "824", "Executive and PSR": "Pradeep Verma(SE)(600184)", "EXE ID": "82", "PSR": "", "PSR ID": "", "ASM": "Anoop Tiwari"},
+{"Beat name": "Bikapur to Chaure Bazar 1", "Beat id": "825", "Executive and PSR": "Pradeep Verma(SE)(600184)", "EXE ID": "82", "PSR": "", "PSR ID": "", "ASM": "Anoop Tiwari"},
+{"Beat name": "Bikapur to Chaure Bazar 2", "Beat id": "826", "Executive and PSR": "Pradeep Verma(SE)(600184)", "EXE ID": "82", "PSR": "", "PSR ID": "", "ASM": "Anoop Tiwari"},
+{"Beat name": "Bikapur to chaurebazar", "Beat id": "341", "Executive and PSR": "Pradeep Verma(SE)(600184)", "EXE ID": "82", "PSR": "", "PSR ID": "", "ASM": "Anoop Tiwari"},
+{"Beat name": "Bikapur To Chavni", "Beat id": "342", "Executive and PSR": "Pradeep Verma(SE)(600184)", "EXE ID": "82", "PSR": "", "PSR ID": "", "ASM": "Anoop Tiwari"},
+{"Beat name": "Bikapur To Gosaiganj", "Beat id": "343", "Executive and PSR": "Pradeep Verma(SE)(600184)", "EXE ID": "82", "PSR": "", "PSR ID": "", "ASM": "Anoop Tiwari"},
+{"Beat name": "Bikapur To Milkypur", "Beat id": "344", "Executive and PSR": "Pradeep Verma(SE)(600184)", "EXE ID": "82", "PSR": "", "PSR ID": "", "ASM": "Anoop Tiwari"},
+{"Beat name": "Bikapur to Rudauli", "Beat id": "345", "Executive and PSR": "Pradeep Verma(SE)(600184)", "EXE ID": "82", "PSR": "", "PSR ID": "", "ASM": "Anoop Tiwari"},
+{"Beat name": "Bikapur to Rudauli2", "Beat id": "829", "Executive and PSR": "Pradeep Verma(SE)(600184)", "EXE ID": "82", "PSR": "", "PSR ID": "", "ASM": "Anoop Tiwari"},
+{"Beat name": "Bikapur to showal", "Beat id": "346", "Executive and PSR": "Pradeep Verma(SE)(600184)", "EXE ID": "82", "PSR": "", "PSR ID": "", "ASM": "Anoop Tiwari"},
+{"Beat name": "Akabarpur To Alapur", "Beat id": "887", "Executive and PSR": "Vikas Singh(SE)(600134)", "EXE ID": "97", "PSR": "", "PSR ID": "", "ASM": "Anoop Tiwari"},
+{"Beat name": "Akabarpur To Jahghir ganj", "Beat id": "21", "Executive and PSR": "Vikas Singh(SE)(600134)", "EXE ID": "97", "PSR": "", "PSR ID": "", "ASM": "Anoop Tiwari"},
+{"Beat name": "Akabarpur To Jalalpur", "Beat id": "22", "Executive and PSR": "Vikas Singh(SE)(600134)", "EXE ID": "97", "PSR": "", "PSR ID": "", "ASM": "Anoop Tiwari"},
+{"Beat name": "Akabarpur To Katehri", "Beat id": "23", "Executive and PSR": "Vikas Singh(SE)(600134)", "EXE ID": "97", "PSR": "", "PSR ID": "", "ASM": "Anoop Tiwari"},
+{"Beat name": "Akabarpur To Nevada", "Beat id": "24", "Executive and PSR": "Vikas Singh(SE)(600134)", "EXE ID": "97", "PSR": "", "PSR ID": "", "ASM": "Anoop Tiwari"},
+{"Beat name": "Akabarpur To Pakdi Bhojpur", "Beat id": "25", "Executive and PSR": "Vikas Singh(SE)(600134)", "EXE ID": "97", "PSR": "", "PSR ID": "", "ASM": "Anoop Tiwari"},
+{"Beat name": "Akabarpur To Ramnagar", "Beat id": "26", "Executive and PSR": "Vikas Singh(SE)(600134)", "EXE ID": "97", "PSR": "", "PSR ID": "", "ASM": "Anoop Tiwari"},
+{"Beat name": "Akabarpur To Shukul Bajar", "Beat id": "27", "Executive and PSR": "Vikas Singh(SE)(600134)", "EXE ID": "97", "PSR": "", "PSR ID": "", "ASM": "Anoop Tiwari"},
+{"Beat name": "Akabarpur To Tanda", "Beat id": "28", "Executive and PSR": "Vikas Singh(SE)(600134)", "EXE ID": "97", "PSR": "", "PSR ID": "", "ASM": "Anoop Tiwari"},
+{"Beat name": "Akbarpur To Amsin", "Beat id": "29", "Executive and PSR": "Vikas Singh(SE)(600134)", "EXE ID": "97", "PSR": "", "PSR ID": "", "ASM": "Anoop Tiwari"},
+{"Beat name": "Akbarpur To Bahlolpur", "Beat id": "30", "Executive and PSR": "Vikas Singh(SE)(600134)", "EXE ID": "97", "PSR": "", "PSR ID": "", "ASM": "Anoop Tiwari"},
+{"Beat name": "Akbarpur To Baskhari", "Beat id": "31", "Executive and PSR": "Vikas Singh(SE)(600134)", "EXE ID": "97", "PSR": "", "PSR ID": "", "ASM": "Anoop Tiwari"},
+{"Beat name": "Akbarpur To Bhiti", "Beat id": "32", "Executive and PSR": "Vikas Singh(SE)(600134)", "EXE ID": "97", "PSR": "", "PSR ID": "", "ASM": "Anoop Tiwari"},
+{"Beat name": "Malipur To mittupur", "Beat id": "33", "Executive and PSR": "Vikas Singh(SE)(600134)", "EXE ID": "97", "PSR": "", "PSR ID": "", "ASM": "Anoop Tiwari"},
+{"Beat name": "Malipur To Sikandarpur", "Beat id": "34", "Executive and PSR": "Vikas Singh(SE)(600134)", "EXE ID": "97", "PSR": "", "PSR ID": "", "ASM": "Anoop Tiwari"},
+{"Beat name": "Tanda to Jamunipur", "Beat id": "932", "Executive and PSR": "Vikas Singh(SE)(600134)", "EXE ID": "97", "PSR": "", "PSR ID": "", "ASM": "Anoop Tiwari"},
+{"Beat name": "Tanda to Karbala", "Beat id": "933", "Executive and PSR": "Vikas Singh(SE)(600134)", "EXE ID": "97", "PSR": "", "PSR ID": "", "ASM": "Anoop Tiwari"},
+{"Beat name": "Tanda To N.T.P.C", "Beat id": "934", "Executive and PSR": "Vikas Singh(SE)(600134)", "EXE ID": "97", "PSR": "", "PSR ID": "", "ASM": "Anoop Tiwari"},
+{"Beat name": "Tanda to Sikandarpur", "Beat id": "935", "Executive and PSR": "Vikas Singh(SE)(600134)", "EXE ID": "97", "PSR": "", "PSR ID": "", "ASM": "Anoop Tiwari"},
+{"Beat name": "Bindki to Amouli", "Beat id": "654", "Executive and PSR": "Shray(SE)(600265)", "EXE ID": "160", "PSR": "", "PSR ID": "", "ASM": "Anoop Tiwari"},
+{"Beat name": "Bindki to khajua", "Beat id": "661", "Executive and PSR": "Shray(SE)(600265)", "EXE ID": "160", "PSR": "", "PSR ID": "", "ASM": "Anoop Tiwari"},
+{"Beat name": "Fatehpur to amouli", "Beat id": "635", "Executive and PSR": "Shray(SE)(600265)", "EXE ID": "160", "PSR": "", "PSR ID": "", "ASM": "Anoop Tiwari"},
+{"Beat name": "Fatehpur To Bhitora", "Beat id": "595", "Executive and PSR": "Shray(SE)(600265)", "EXE ID": "160", "PSR": "", "PSR ID": "", "ASM": "Anoop Tiwari"},
+{"Beat name": "Fatehpur to bindki", "Beat id": "636", "Executive and PSR": "Shray(SE)(600265)", "EXE ID": "160", "PSR": "", "PSR ID": "", "ASM": "Anoop Tiwari"},
+{"Beat name": "Fatehpur to khaga", "Beat id": "637", "Executive and PSR": "Shray(SE)(600265)", "EXE ID": "160", "PSR": "", "PSR ID": "", "ASM": "Anoop Tiwari"},
+{"Beat name": "Juniha To Amouli", "Beat id": "655", "Executive and PSR": "Shray(SE)(600265)", "EXE ID": "160", "PSR": "", "PSR ID": "", "ASM": "Anoop Tiwari"},
+{"Beat name": "Firozabad To Mustafabad", "Beat id": "376", "Executive and PSR": "Abhishek Mishra(SE)(600221)", "EXE ID": "57", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Mustafabad to bhadana", "Beat id": "721", "Executive and PSR": "Abhishek Mishra(SE)(600221)", "EXE ID": "57", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Mustafabad to Fariha", "Beat id": "739", "Executive and PSR": "Abhishek Mishra(SE)(600221)", "EXE ID": "57", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Mustafabad to gopalpur", "Beat id": "722", "Executive and PSR": "Abhishek Mishra(SE)(600221)", "EXE ID": "57", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Mustafabad to hathvant", "Beat id": "720", "Executive and PSR": "Abhishek Mishra(SE)(600221)", "EXE ID": "57", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Mustafabad to Nagla jaat", "Beat id": "744", "Executive and PSR": "Abhishek Mishra(SE)(600221)", "EXE ID": "57", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Mustafabad to nagla pasi", "Beat id": "808", "Executive and PSR": "Abhishek Mishra(SE)(600221)", "EXE ID": "57", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "mustafabad to parham", "Beat id": "809", "Executive and PSR": "Abhishek Mishra(SE)(600221)", "EXE ID": "57", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Mustafabad to patara", "Beat id": "807", "Executive and PSR": "Abhishek Mishra(SE)(600221)", "EXE ID": "57", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "mustafabd to nagla meva", "Beat id": "806", "Executive and PSR": "Abhishek Mishra(SE)(600221)", "EXE ID": "57", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Mustfabad to Eka", "Beat id": "572", "Executive and PSR": "Abhishek Mishra(SE)(600221)", "EXE ID": "57", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Mustfabad to Jasrana", "Beat id": "578", "Executive and PSR": "Abhishek Mishra(SE)(600221)", "EXE ID": "57", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Shikohabad Local", "Beat id": "611", "Executive and PSR": "Abhishek Mishra(SE)(600221)", "EXE ID": "57", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Shikohabad to Araon", "Beat id": "645", "Executive and PSR": "Abhishek Mishra(SE)(600221)", "EXE ID": "57", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Shikohabad to Nanimau", "Beat id": "579", "Executive and PSR": "Abhishek Mishra(SE)(600221)", "EXE ID": "57", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Shikohabad to Nasirpur", "Beat id": "576", "Executive and PSR": "Abhishek Mishra(SE)(600221)", "EXE ID": "57", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Shikohabad to Sirshaganj", "Beat id": "587", "Executive and PSR": "Abhishek Mishra(SE)(600221)", "EXE ID": "57", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "shikohbad - mustafabad", "Beat id": "531", "Executive and PSR": "Abhishek Mishra(SE)(600221)", "EXE ID": "57", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Abhaypura", "Beat id": "785", "Executive and PSR": "Deepak Tomar(SE)(600203)", "EXE ID": "71", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Achnera to Khaeragrh", "Beat id": "626", "Executive and PSR": "Deepak Tomar(SE)(600203)", "EXE ID": "71", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Agra to Achnera", "Beat id": "248", "Executive and PSR": "Deepak Tomar(SE)(600203)", "EXE ID": "71", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Agra To Awankhera and barhan", "Beat id": "249", "Executive and PSR": "Deepak Tomar(SE)(600203)", "EXE ID": "71", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Agra to Bharatpur", "Beat id": "250", "Executive and PSR": "Deepak Tomar(SE)(600203)", "EXE ID": "71", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Agra to Fatehbad", "Beat id": "251", "Executive and PSR": "Deepak Tomar(SE)(600203)", "EXE ID": "71", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Agra To Pinhat", "Beat id": "252", "Executive and PSR": "Deepak Tomar(SE)(600203)", "EXE ID": "71", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Agra to Samsabad", "Beat id": "253", "Executive and PSR": "Deepak Tomar(SE)(600203)", "EXE ID": "71", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Arnota", "Beat id": "754", "Executive and PSR": "Deepak Tomar(SE)(600203)", "EXE ID": "71", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Arnota to fatehabad", "Beat id": "792", "Executive and PSR": "Deepak Tomar(SE)(600203)", "EXE ID": "71", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Bah to jaitpur", "Beat id": "789", "Executive and PSR": "Deepak Tomar(SE)(600203)", "EXE ID": "71", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Bah to kachoraghat", "Beat id": "791", "Executive and PSR": "Deepak Tomar(SE)(600203)", "EXE ID": "71", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Bah to nasheerpur thana", "Beat id": "790", "Executive and PSR": "Deepak Tomar(SE)(600203)", "EXE ID": "71", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Bhadrauli to jarar", "Beat id": "788", "Executive and PSR": "Deepak Tomar(SE)(600203)", "EXE ID": "71", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Fatehabad to dauki", "Beat id": "795", "Executive and PSR": "Deepak Tomar(SE)(600203)", "EXE ID": "71", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Fatehbad to nigora", "Beat id": "793", "Executive and PSR": "Deepak Tomar(SE)(600203)", "EXE ID": "71", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Hathras To Hasayan", "Beat id": "382", "Executive and PSR": "Deepak Tomar(SE)(600203)", "EXE ID": "71", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Hathras To Jalesar Road", "Beat id": "383", "Executive and PSR": "Deepak Tomar(SE)(600203)", "EXE ID": "71", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Hathras To Mursan", "Beat id": "384", "Executive and PSR": "Deepak Tomar(SE)(600203)", "EXE ID": "71", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Hathras To Purtilnagar and Koka kakori", "Beat id": "385", "Executive and PSR": "Deepak Tomar(SE)(600203)", "EXE ID": "71", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Hathras To Sadabad", "Beat id": "386", "Executive and PSR": "Deepak Tomar(SE)(600203)", "EXE ID": "71", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Hathras To Sasni", "Beat id": "387", "Executive and PSR": "Deepak Tomar(SE)(600203)", "EXE ID": "71", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Hathras to Sikandra Rao Road", "Beat id": "388", "Executive and PSR": "Deepak Tomar(SE)(600203)", "EXE ID": "71", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Hathrash aligarh road", "Beat id": "801", "Executive and PSR": "Deepak Tomar(SE)(600203)", "EXE ID": "71", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Hathrash to iglash road", "Beat id": "796", "Executive and PSR": "Deepak Tomar(SE)(600203)", "EXE ID": "71", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Hathrash to keshopur", "Beat id": "798", "Executive and PSR": "Deepak Tomar(SE)(600203)", "EXE ID": "71", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "hathrash to manikpur", "Beat id": "799", "Executive and PSR": "Deepak Tomar(SE)(600203)", "EXE ID": "71", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Hathrash to pura station road", "Beat id": "800", "Executive and PSR": "Deepak Tomar(SE)(600203)", "EXE ID": "71", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Hathrash to shepau", "Beat id": "797", "Executive and PSR": "Deepak Tomar(SE)(600203)", "EXE ID": "71", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "manikpur to bharauli", "Beat id": "787", "Executive and PSR": "Deepak Tomar(SE)(600203)", "EXE ID": "71", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Papainagar", "Beat id": "742", "Executive and PSR": "Deepak Tomar(SE)(600203)", "EXE ID": "71", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Achara To Ahmadganj", "Beat id": "47", "Executive and PSR": "Gaurav Singh(SE)(600214)", "EXE ID": "73", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Achara To Navabganj", "Beat id": "48", "Executive and PSR": "Gaurav Singh(SE)(600214)", "EXE ID": "73", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Achara To Navgonv", "Beat id": "49", "Executive and PSR": "Gaurav Singh(SE)(600214)", "EXE ID": "73", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Achara To Rudayan", "Beat id": "50", "Executive and PSR": "Gaurav Singh(SE)(600214)", "EXE ID": "73", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Achara To Sarayagahat", "Beat id": "51", "Executive and PSR": "Gaurav Singh(SE)(600214)", "EXE ID": "73", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Achara To Shamshabad", "Beat id": "52", "Executive and PSR": "Gaurav Singh(SE)(600214)", "EXE ID": "73", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Achara To shivara", "Beat id": "741", "Executive and PSR": "Gaurav Singh(SE)(600214)", "EXE ID": "73", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Achara to shiwara", "Beat id": "774", "Executive and PSR": "Gaurav Singh(SE)(600214)", "EXE ID": "73", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Baghar To Mommdabad", "Beat id": "53", "Executive and PSR": "Gaurav Singh(SE)(600214)", "EXE ID": "73", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Gadnapur To Khudaganj", "Beat id": "56", "Executive and PSR": "Gaurav Singh(SE)(600214)", "EXE ID": "73", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Gadnapur To Mohammdabad", "Beat id": "57", "Executive and PSR": "Gaurav Singh(SE)(600214)", "EXE ID": "73", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "kaimganj to Ataina", "Beat id": "773", "Executive and PSR": "Gaurav Singh(SE)(600214)", "EXE ID": "73", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Muran To Madnapur", "Beat id": "58", "Executive and PSR": "Gaurav Singh(SE)(600214)", "EXE ID": "73", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Muran To Nawabganj", "Beat id": "59", "Executive and PSR": "Gaurav Singh(SE)(600214)", "EXE ID": "73", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Muran To Sarai Aghat", "Beat id": "60", "Executive and PSR": "Gaurav Singh(SE)(600214)", "EXE ID": "73", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "muran to Tiliyan", "Beat id": "772", "Executive and PSR": "Gaurav Singh(SE)(600214)", "EXE ID": "73", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Salempur To Farrukhabad", "Beat id": "62", "Executive and PSR": "Gaurav Singh(SE)(600214)", "EXE ID": "73", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Salempur To Goojarpur", "Beat id": "63", "Executive and PSR": "Gaurav Singh(SE)(600214)", "EXE ID": "73", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Salempur To Karhar", "Beat id": "64", "Executive and PSR": "Gaurav Singh(SE)(600214)", "EXE ID": "73", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Bhongaon To Aalipur", "Beat id": "331", "Executive and PSR": "Mahendra Babu(SE)(600143)", "EXE ID": "77", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Chitain", "Beat id": "778", "Executive and PSR": "Mahendra Babu(SE)(600143)", "EXE ID": "77", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Chitayan", "Beat id": "750", "Executive and PSR": "Mahendra Babu(SE)(600143)", "EXE ID": "77", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Chuaturipuri", "Beat id": "779", "Executive and PSR": "Mahendra Babu(SE)(600143)", "EXE ID": "77", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Jasmai", "Beat id": "752", "Executive and PSR": "Mahendra Babu(SE)(600143)", "EXE ID": "77", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "kishani local", "Beat id": "776", "Executive and PSR": "Mahendra Babu(SE)(600143)", "EXE ID": "77", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Kursenda", "Beat id": "753", "Executive and PSR": "Mahendra Babu(SE)(600143)", "EXE ID": "77", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Kushmara market", "Beat id": "751", "Executive and PSR": "Mahendra Babu(SE)(600143)", "EXE ID": "77", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "lehgaon", "Beat id": "781", "Executive and PSR": "Mahendra Babu(SE)(600143)", "EXE ID": "77", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Mainpuri Sadar", "Beat id": "714", "Executive and PSR": "Mahendra Babu(SE)(600143)", "EXE ID": "77", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Mainpuri to Alau", "Beat id": "871", "Executive and PSR": "Mahendra Babu(SE)(600143)", "EXE ID": "77", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Mainpuri to Auchha", "Beat id": "416", "Executive and PSR": "Mahendra Babu(SE)(600143)", "EXE ID": "77", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Mainpuri to Barnahal road", "Beat id": "870", "Executive and PSR": "Mahendra Babu(SE)(600143)", "EXE ID": "77", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Mainpuri to Bewar", "Beat id": "417", "Executive and PSR": "Mahendra Babu(SE)(600143)", "EXE ID": "77", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Mainpuri to Gehiror", "Beat id": "419", "Executive and PSR": "Mahendra Babu(SE)(600143)", "EXE ID": "77", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Mainpuri to Jyoti road", "Beat id": "872", "Executive and PSR": "Mahendra Babu(SE)(600143)", "EXE ID": "77", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Mainpuri To Karhal", "Beat id": "615", "Executive and PSR": "Mahendra Babu(SE)(600143)", "EXE ID": "77", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Mainpuri To Kishni", "Beat id": "420", "Executive and PSR": "Mahendra Babu(SE)(600143)", "EXE ID": "77", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "MAINPURI TO KURAWALI", "Beat id": "691", "Executive and PSR": "Mahendra Babu(SE)(600143)", "EXE ID": "77", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Mainpuri to Kurawali road", "Beat id": "873", "Executive and PSR": "Mahendra Babu(SE)(600143)", "EXE ID": "77", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Mainpuri To Kushmara", "Beat id": "421", "Executive and PSR": "Mahendra Babu(SE)(600143)", "EXE ID": "77", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Ramnagar", "Beat id": "780", "Executive and PSR": "Mahendra Babu(SE)(600143)", "EXE ID": "77", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "sakra", "Beat id": "784", "Executive and PSR": "Mahendra Babu(SE)(600143)", "EXE ID": "77", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Saman Katra", "Beat id": "777", "Executive and PSR": "Mahendra Babu(SE)(600143)", "EXE ID": "77", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Sauch", "Beat id": "783", "Executive and PSR": "Mahendra Babu(SE)(600143)", "EXE ID": "77", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Shamsherganj", "Beat id": "782", "Executive and PSR": "Mahendra Babu(SE)(600143)", "EXE ID": "77", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Aliganj market", "Beat id": "762", "Executive and PSR": "Sanjeev Kumar(SE)(600230)", "EXE ID": "87", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Aliganj Market(Etah)", "Beat id": "748", "Executive and PSR": "Sanjeev Kumar(SE)(600230)", "EXE ID": "87", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Baghrai to Aliganj road", "Beat id": "899", "Executive and PSR": "Sanjeev Kumar(SE)(600230)", "EXE ID": "87", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Bani", "Beat id": "758", "Executive and PSR": "Sanjeev Kumar(SE)(600230)", "EXE ID": "87", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Barna", "Beat id": "757", "Executive and PSR": "Sanjeev Kumar(SE)(600230)", "EXE ID": "87", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Berni", "Beat id": "768", "Executive and PSR": "Sanjeev Kumar(SE)(600230)", "EXE ID": "87", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Dalshapur", "Beat id": "767", "Executive and PSR": "Sanjeev Kumar(SE)(600230)", "EXE ID": "87", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Dariyaoganj", "Beat id": "755", "Executive and PSR": "Sanjeev Kumar(SE)(600230)", "EXE ID": "87", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Devkaranpur", "Beat id": "770", "Executive and PSR": "Sanjeev Kumar(SE)(600230)", "EXE ID": "87", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Dhomri to Bagwala", "Beat id": "594", "Executive and PSR": "Sanjeev Kumar(SE)(600230)", "EXE ID": "87", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Dhumari to Bagwala", "Beat id": "881", "Executive and PSR": "Sanjeev Kumar(SE)(600230)", "EXE ID": "87", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Dhumri to Aliganj", "Beat id": "592", "Executive and PSR": "Sanjeev Kumar(SE)(600230)", "EXE ID": "87", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Dhumri to Manawan", "Beat id": "593", "Executive and PSR": "Sanjeev Kumar(SE)(600230)", "EXE ID": "87", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Etah to Aliganj", "Beat id": "366", "Executive and PSR": "Sanjeev Kumar(SE)(600230)", "EXE ID": "87", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Etah To Basundhra", "Beat id": "367", "Executive and PSR": "Sanjeev Kumar(SE)(600230)", "EXE ID": "87", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Etah To Marahra", "Beat id": "368", "Executive and PSR": "Sanjeev Kumar(SE)(600230)", "EXE ID": "87", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Etah To Pahram", "Beat id": "369", "Executive and PSR": "Sanjeev Kumar(SE)(600230)", "EXE ID": "87", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Etah to Sakit", "Beat id": "370", "Executive and PSR": "Sanjeev Kumar(SE)(600230)", "EXE ID": "87", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Etha To Nidhauli", "Beat id": "375", "Executive and PSR": "Sanjeev Kumar(SE)(600230)", "EXE ID": "87", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Jalesar To awagarh", "Beat id": "390", "Executive and PSR": "Sanjeev Kumar(SE)(600230)", "EXE ID": "87", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Jalesar to Dalsapur", "Beat id": "850", "Executive and PSR": "Sanjeev Kumar(SE)(600230)", "EXE ID": "87", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Jalesar To Ishauli Chauraha", "Beat id": "536", "Executive and PSR": "Sanjeev Kumar(SE)(600230)", "EXE ID": "87", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Jalesar to Nidhaulikala", "Beat id": "391", "Executive and PSR": "Sanjeev Kumar(SE)(600230)", "EXE ID": "87", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Jalesar to Rizawali Chauraha", "Beat id": "392", "Executive and PSR": "Sanjeev Kumar(SE)(600230)", "EXE ID": "87", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Jaleshar local", "Beat id": "765", "Executive and PSR": "Sanjeev Kumar(SE)(600230)", "EXE ID": "87", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Jinawali", "Beat id": "766", "Executive and PSR": "Sanjeev Kumar(SE)(600230)", "EXE ID": "87", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Mahanmai", "Beat id": "771", "Executive and PSR": "Sanjeev Kumar(SE)(600230)", "EXE ID": "87", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Neemsarai", "Beat id": "764", "Executive and PSR": "Sanjeev Kumar(SE)(600230)", "EXE ID": "87", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Nirupur", "Beat id": "759", "Executive and PSR": "Sanjeev Kumar(SE)(600230)", "EXE ID": "87", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Patiyali to bahora", "Beat id": "441", "Executive and PSR": "Sanjeev Kumar(SE)(600230)", "EXE ID": "87", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "patiyali to dariyawganj", "Beat id": "442", "Executive and PSR": "Sanjeev Kumar(SE)(600230)", "EXE ID": "87", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Patiyali to sidpura", "Beat id": "443", "Executive and PSR": "Sanjeev Kumar(SE)(600230)", "EXE ID": "87", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Patna (Etah)", "Beat id": "749", "Executive and PSR": "Sanjeev Kumar(SE)(600230)", "EXE ID": "87", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Rampur", "Beat id": "740", "Executive and PSR": "Sanjeev Kumar(SE)(600230)", "EXE ID": "87", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Sarai road", "Beat id": "761", "Executive and PSR": "Sanjeev Kumar(SE)(600230)", "EXE ID": "87", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Saraunth", "Beat id": "760", "Executive and PSR": "Sanjeev Kumar(SE)(600230)", "EXE ID": "87", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Sarawal", "Beat id": "756", "Executive and PSR": "Sanjeev Kumar(SE)(600230)", "EXE ID": "87", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Soron to kasganj", "Beat id": "478", "Executive and PSR": "Sanjeev Kumar(SE)(600230)", "EXE ID": "87", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Soron to Nagariya", "Beat id": "479", "Executive and PSR": "Sanjeev Kumar(SE)(600230)", "EXE ID": "87", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Soron to Nagariya - Deactive", "Beat id": "480", "Executive and PSR": "Sanjeev Kumar(SE)(600230)", "EXE ID": "87", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Soron to Sahawer", "Beat id": "481", "Executive and PSR": "Sanjeev Kumar(SE)(600230)", "EXE ID": "87", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Soron to salempur", "Beat id": "483", "Executive and PSR": "Sanjeev Kumar(SE)(600230)", "EXE ID": "87", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Aligarh To Akrabad Road", "Beat id": "254", "Executive and PSR": "Satendra Pal(SE)(600272)", "EXE ID": "216", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Aligarh To Atrauli Road", "Beat id": "255", "Executive and PSR": "Satendra Pal(SE)(600272)", "EXE ID": "216", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Aligarh to chandaush", "Beat id": "745", "Executive and PSR": "Satendra Pal(SE)(600272)", "EXE ID": "216", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Aligarh to charra And Barla", "Beat id": "804", "Executive and PSR": "Satendra Pal(SE)(600272)", "EXE ID": "216", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Aligarh to gonda", "Beat id": "837", "Executive and PSR": "Satendra Pal(SE)(600272)", "EXE ID": "216", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Aligarh To Gopi", "Beat id": "256", "Executive and PSR": "Satendra Pal(SE)(600272)", "EXE ID": "216", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Aligarh to Gwahana", "Beat id": "257", "Executive and PSR": "Satendra Pal(SE)(600272)", "EXE ID": "216", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Aligarh To Iglas Road", "Beat id": "258", "Executive and PSR": "Satendra Pal(SE)(600272)", "EXE ID": "216", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Aligarh to jalali", "Beat id": "803", "Executive and PSR": "Satendra Pal(SE)(600272)", "EXE ID": "216", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Aligarh To Java", "Beat id": "259", "Executive and PSR": "Satendra Pal(SE)(600272)", "EXE ID": "216", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Aligarh to jawan", "Beat id": "875", "Executive and PSR": "Satendra Pal(SE)(600272)", "EXE ID": "216", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Aligarh To Khair Road 1", "Beat id": "260", "Executive and PSR": "Satendra Pal(SE)(600272)", "EXE ID": "216", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Aligarh To Khair Road 2", "Beat id": "261", "Executive and PSR": "Satendra Pal(SE)(600272)", "EXE ID": "216", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Aligarh To Madrak", "Beat id": "262", "Executive and PSR": "Satendra Pal(SE)(600272)", "EXE ID": "216", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Barla Charra", "Beat id": "894", "Executive and PSR": "Satendra Pal(SE)(600272)", "EXE ID": "216", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Basroi", "Beat id": "746", "Executive and PSR": "Satendra Pal(SE)(600272)", "EXE ID": "216", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Dhanipur Mandi To Boner 1", "Beat id": "364", "Executive and PSR": "Satendra Pal(SE)(600272)", "EXE ID": "216", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Dhanipur Mandi To Boner 2", "Beat id": "365", "Executive and PSR": "Satendra Pal(SE)(600272)", "EXE ID": "216", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Gonda To Gonda Mod", "Beat id": "379", "Executive and PSR": "Satendra Pal(SE)(600272)", "EXE ID": "216", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Gonda To Iglas", "Beat id": "380", "Executive and PSR": "Satendra Pal(SE)(600272)", "EXE ID": "216", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Harduaganj", "Beat id": "743", "Executive and PSR": "Satendra Pal(SE)(600272)", "EXE ID": "216", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Hastpur to Basgoi", "Beat id": "874", "Executive and PSR": "Satendra Pal(SE)(600272)", "EXE ID": "216", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Kamalpur loacal", "Beat id": "802", "Executive and PSR": "Satendra Pal(SE)(600272)", "EXE ID": "216", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "kareka to vijhera", "Beat id": "860", "Executive and PSR": "Satendra Pal(SE)(600272)", "EXE ID": "216", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "pilkhana And tehra", "Beat id": "805", "Executive and PSR": "Satendra Pal(SE)(600272)", "EXE ID": "216", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Pishai", "Beat id": "763", "Executive and PSR": "Satendra Pal(SE)(600272)", "EXE ID": "216", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Shahri", "Beat id": "786", "Executive and PSR": "Satendra Pal(SE)(600272)", "EXE ID": "216", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Taharpur", "Beat id": "878", "Executive and PSR": "Satendra Pal(SE)(600272)", "EXE ID": "216", "PSR": "", "PSR ID": "", "ASM": "Arun Kumar"},
+{"Beat name": "Gogmau to Amethi", "Beat id": "35", "Executive and PSR": "Gaurav Singh(SE)(600082)", "EXE ID": "74", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Gogmau to Durgapur", "Beat id": "36", "Executive and PSR": "Gaurav Singh(SE)(600082)", "EXE ID": "74", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Gogmau to Jais", "Beat id": "37", "Executive and PSR": "Gaurav Singh(SE)(600082)", "EXE ID": "74", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Gogmou To Gouriganj_Road", "Beat id": "38", "Executive and PSR": "Gaurav Singh(SE)(600082)", "EXE ID": "74", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Gogmou To Jamo", "Beat id": "39", "Executive and PSR": "Gaurav Singh(SE)(600082)", "EXE ID": "74", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Gogmou To Jamo 2", "Beat id": "40", "Executive and PSR": "Gaurav Singh(SE)(600082)", "EXE ID": "74", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Gogmou To Musafirkhana", "Beat id": "41", "Executive and PSR": "Gaurav Singh(SE)(600082)", "EXE ID": "74", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Gogmou To Musafirkhana 2", "Beat id": "42", "Executive and PSR": "Gaurav Singh(SE)(600082)", "EXE ID": "74", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Gogmou To Raniganj", "Beat id": "43", "Executive and PSR": "Gaurav Singh(SE)(600082)", "EXE ID": "74", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Raniganj to Jagdishpur", "Beat id": "44", "Executive and PSR": "Gaurav Singh(SE)(600082)", "EXE ID": "74", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Raniganj to Shukul Bazar", "Beat id": "45", "Executive and PSR": "Gaurav Singh(SE)(600082)", "EXE ID": "74", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Raniganj to Tiloi Road", "Beat id": "46", "Executive and PSR": "Gaurav Singh(SE)(600082)", "EXE ID": "74", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Badlapur to Ghanshyampur", "Beat id": "85", "Executive and PSR": "Narendra Prasad(SE)(600204)", "EXE ID": "80", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Badlapur to mahraj ganj", "Beat id": "86", "Executive and PSR": "Narendra Prasad(SE)(600204)", "EXE ID": "80", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Jaunpur To Baksha", "Beat id": "87", "Executive and PSR": "Narendra Prasad(SE)(600204)", "EXE ID": "80", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Jaunpur To Khuthan.", "Beat id": "88", "Executive and PSR": "Narendra Prasad(SE)(600204)", "EXE ID": "80", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Jaunpur To Tighra", "Beat id": "89", "Executive and PSR": "Narendra Prasad(SE)(600204)", "EXE ID": "80", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Sahganj to Galglashid", "Beat id": "90", "Executive and PSR": "Narendra Prasad(SE)(600204)", "EXE ID": "80", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Sahganj to Patti", "Beat id": "91", "Executive and PSR": "Narendra Prasad(SE)(600204)", "EXE ID": "80", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Sahganj to Patti 2", "Beat id": "92", "Executive and PSR": "Narendra Prasad(SE)(600204)", "EXE ID": "80", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Sari Barauna To Kuthan", "Beat id": "93", "Executive and PSR": "Narendra Prasad(SE)(600204)", "EXE ID": "80", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Antamau Kunda hiragav", "Beat id": "927", "Executive and PSR": "Rana Singh(SE)(600207)", "EXE ID": "86", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Avsanganj Lakpada", "Beat id": "931", "Executive and PSR": "Rana Singh(SE)(600207)", "EXE ID": "86", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Deewangan To Udaiya De", "Beat id": "127", "Executive and PSR": "Rana Singh(SE)(600207)", "EXE ID": "86", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Dhakwa to Amargarh", "Beat id": "128", "Executive and PSR": "Rana Singh(SE)(600207)", "EXE ID": "86", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Dhakwa to chadha", "Beat id": "129", "Executive and PSR": "Rana Singh(SE)(600207)", "EXE ID": "86", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Dhakwa to Patti", "Beat id": "685", "Executive and PSR": "Rana Singh(SE)(600207)", "EXE ID": "86", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Dhakwa to siafabad", "Beat id": "130", "Executive and PSR": "Rana Singh(SE)(600207)", "EXE ID": "86", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Diwanganj To Chilbila", "Beat id": "131", "Executive and PSR": "Rana Singh(SE)(600207)", "EXE ID": "86", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Diwanganj to kohrod", "Beat id": "132", "Executive and PSR": "Rana Singh(SE)(600207)", "EXE ID": "86", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Diwanganj to mangraura", "Beat id": "133", "Executive and PSR": "Rana Singh(SE)(600207)", "EXE ID": "86", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Janwamau to Kunda", "Beat id": "688", "Executive and PSR": "Rana Singh(SE)(600207)", "EXE ID": "86", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Janwamau to lavana bhavanighaj", "Beat id": "684", "Executive and PSR": "Rana Singh(SE)(600207)", "EXE ID": "86", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Lalganj to Jalesarganj", "Beat id": "134", "Executive and PSR": "Rana Singh(SE)(600207)", "EXE ID": "86", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Lalganj to Jathwara", "Beat id": "135", "Executive and PSR": "Rana Singh(SE)(600207)", "EXE ID": "86", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Lalganj to Sagraa", "Beat id": "136", "Executive and PSR": "Rana Singh(SE)(600207)", "EXE ID": "86", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Lalganj To Sangipur", "Beat id": "137", "Executive and PSR": "Rana Singh(SE)(600207)", "EXE ID": "86", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Pratapgarh To Lilapur", "Beat id": "138", "Executive and PSR": "Rana Singh(SE)(600207)", "EXE ID": "86", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Pratapgarh To Patti", "Beat id": "139", "Executive and PSR": "Rana Singh(SE)(600207)", "EXE ID": "86", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Rajvapur Lvana", "Beat id": "929", "Executive and PSR": "Rana Singh(SE)(600207)", "EXE ID": "86", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Sabispur Arkhaborder", "Beat id": "898", "Executive and PSR": "Rana Singh(SE)(600207)", "EXE ID": "86", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Sangramgarh Narhai", "Beat id": "892", "Executive and PSR": "Rana Singh(SE)(600207)", "EXE ID": "86", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Baraunsa To birsingh pur", "Beat id": "207", "Executive and PSR": "Vikas Kumar Verma(SE)(600088)", "EXE ID": "96", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Baraunsa To Dostpur", "Beat id": "208", "Executive and PSR": "Vikas Kumar Verma(SE)(600088)", "EXE ID": "96", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Baraunsa To Kurebhar", "Beat id": "209", "Executive and PSR": "Vikas Kumar Verma(SE)(600088)", "EXE ID": "96", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Baraunsa To Panday baba", "Beat id": "210", "Executive and PSR": "Vikas Kumar Verma(SE)(600088)", "EXE ID": "96", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Dhanpat ganj to Chaure Bazar", "Beat id": "584", "Executive and PSR": "Vikas Kumar Verma(SE)(600088)", "EXE ID": "96", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Dhanpat ganj to Dehli", "Beat id": "582", "Executive and PSR": "Vikas Kumar Verma(SE)(600088)", "EXE ID": "96", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Dhanpat ganj to Katka", "Beat id": "581", "Executive and PSR": "Vikas Kumar Verma(SE)(600088)", "EXE ID": "96", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Dhanpat ganj to Pidhi", "Beat id": "583", "Executive and PSR": "Vikas Kumar Verma(SE)(600088)", "EXE ID": "96", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Gaura Tikari To Dhakhwa", "Beat id": "211", "Executive and PSR": "Vikas Kumar Verma(SE)(600088)", "EXE ID": "96", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Gaura Tikari To Galgala Saheed", "Beat id": "212", "Executive and PSR": "Vikas Kumar Verma(SE)(600088)", "EXE ID": "96", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Gaura Tikari To Surapur", "Beat id": "213", "Executive and PSR": "Vikas Kumar Verma(SE)(600088)", "EXE ID": "96", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Haliyapur To Bahurava", "Beat id": "215", "Executive and PSR": "Vikas Kumar Verma(SE)(600088)", "EXE ID": "96", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Haliyapur To Baldirai", "Beat id": "216", "Executive and PSR": "Vikas Kumar Verma(SE)(600088)", "EXE ID": "96", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Haliyapur To Kumarganj", "Beat id": "217", "Executive and PSR": "Vikas Kumar Verma(SE)(600088)", "EXE ID": "96", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Haliyapur To Para Bazar", "Beat id": "218", "Executive and PSR": "Vikas Kumar Verma(SE)(600088)", "EXE ID": "96", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Haliyapur To Wallipur", "Beat id": "219", "Executive and PSR": "Vikas Kumar Verma(SE)(600088)", "EXE ID": "96", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Hanumanganj To chanda", "Beat id": "220", "Executive and PSR": "Vikas Kumar Verma(SE)(600088)", "EXE ID": "96", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Hanumanganj To Lambua", "Beat id": "221", "Executive and PSR": "Vikas Kumar Verma(SE)(600088)", "EXE ID": "96", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Hanumanganj To Shahgarh Kutiwa", "Beat id": "222", "Executive and PSR": "Vikas Kumar Verma(SE)(600088)", "EXE ID": "96", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Hanumanganj To Shivgarh", "Beat id": "223", "Executive and PSR": "Vikas Kumar Verma(SE)(600088)", "EXE ID": "96", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Kadipur To Rahul Nagar", "Beat id": "214", "Executive and PSR": "Vikas Kumar Verma(SE)(600088)", "EXE ID": "96", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Kurwar To Aliganj new", "Beat id": "225", "Executive and PSR": "Vikas Kumar Verma(SE)(600088)", "EXE ID": "96", "PSR": "", "PSR ID": "", "ASM": "Arvind Anjana"},
+{"Beat name": "Basantpur", "Beat id": "842", "Executive and PSR": "Aditya Sah(SE)(600183)", "EXE ID": "59", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Maharajganj To Bargadwa", "Beat id": "408", "Executive and PSR": "Aditya Sah(SE)(600183)", "EXE ID": "59", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Maharajganj To Nichlaul", "Beat id": "409", "Executive and PSR": "Aditya Sah(SE)(600183)", "EXE ID": "59", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Maharajganj To Pharenda", "Beat id": "410", "Executive and PSR": "Aditya Sah(SE)(600183)", "EXE ID": "59", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Maharajganj To Senduria", "Beat id": "411", "Executive and PSR": "Aditya Sah(SE)(600183)", "EXE ID": "59", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Maharajganj To Siswabazar", "Beat id": "412", "Executive and PSR": "Aditya Sah(SE)(600183)", "EXE ID": "59", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Mahraj ganj to Navtanwa", "Beat id": "900", "Executive and PSR": "Aditya Sah(SE)(600183)", "EXE ID": "59", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Mahrajganj to Khutaha", "Beat id": "902", "Executive and PSR": "Aditya Sah(SE)(600183)", "EXE ID": "59", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Mahrajganj to Laxmipur", "Beat id": "414", "Executive and PSR": "Aditya Sah(SE)(600183)", "EXE ID": "59", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Mahrajganj to Partawal", "Beat id": "415", "Executive and PSR": "Aditya Sah(SE)(600183)", "EXE ID": "59", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Mahrajganj to Partawal 2", "Beat id": "901", "Executive and PSR": "Aditya Sah(SE)(600183)", "EXE ID": "59", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Pharenda to Bangla", "Beat id": "895", "Executive and PSR": "Aditya Sah(SE)(600183)", "EXE ID": "59", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Pharenda to Belnahwa", "Beat id": "843", "Executive and PSR": "Aditya Sah(SE)(600183)", "EXE ID": "59", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Pharenda to Birjmanganj", "Beat id": "908", "Executive and PSR": "Aditya Sah(SE)(600183)", "EXE ID": "59", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Pharenda To Dhani", "Beat id": "903", "Executive and PSR": "Aditya Sah(SE)(600183)", "EXE ID": "59", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Pharenda to Ghagwa", "Beat id": "905", "Executive and PSR": "Aditya Sah(SE)(600183)", "EXE ID": "59", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Pharenda To Paniara", "Beat id": "904", "Executive and PSR": "Aditya Sah(SE)(600183)", "EXE ID": "59", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Pharenda to Ramnagar", "Beat id": "906", "Executive and PSR": "Aditya Sah(SE)(600183)", "EXE ID": "59", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Pharenda to Raniyapur", "Beat id": "907", "Executive and PSR": "Aditya Sah(SE)(600183)", "EXE ID": "59", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Siswa Munshi", "Beat id": "841", "Executive and PSR": "Aditya Sah(SE)(600183)", "EXE ID": "59", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Basti to Babhnan", "Beat id": "306", "Executive and PSR": "Anadi Krishn(SE)(600163)", "EXE ID": "65", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Basti to Bhanpur", "Beat id": "308", "Executive and PSR": "Anadi Krishn(SE)(600163)", "EXE ID": "65", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Basti to deisand", "Beat id": "307", "Executive and PSR": "Anadi Krishn(SE)(600163)", "EXE ID": "65", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Basti to Gaighat", "Beat id": "309", "Executive and PSR": "Anadi Krishn(SE)(600163)", "EXE ID": "65", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Basti to Hallaur", "Beat id": "918", "Executive and PSR": "Anadi Krishn(SE)(600163)", "EXE ID": "65", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Basti to Kalwari", "Beat id": "310", "Executive and PSR": "Anadi Krishn(SE)(600163)", "EXE ID": "65", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Basti to Kudraha", "Beat id": "921", "Executive and PSR": "Anadi Krishn(SE)(600163)", "EXE ID": "65", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Basti To Mahso", "Beat id": "919", "Executive and PSR": "Anadi Krishn(SE)(600163)", "EXE ID": "65", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Basti to Parasrampur 1", "Beat id": "311", "Executive and PSR": "Anadi Krishn(SE)(600163)", "EXE ID": "65", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Basti to Parasrampur 2", "Beat id": "312", "Executive and PSR": "Anadi Krishn(SE)(600163)", "EXE ID": "65", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Basti to Ramjanki 1", "Beat id": "313", "Executive and PSR": "Anadi Krishn(SE)(600163)", "EXE ID": "65", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Basti to Ramjanki 2", "Beat id": "920", "Executive and PSR": "Anadi Krishn(SE)(600163)", "EXE ID": "65", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Basti to Rudhauli", "Beat id": "314", "Executive and PSR": "Anadi Krishn(SE)(600163)", "EXE ID": "65", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Basti to sangwa", "Beat id": "315", "Executive and PSR": "Anadi Krishn(SE)(600163)", "EXE ID": "65", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Basti to vikramjyot", "Beat id": "316", "Executive and PSR": "Anadi Krishn(SE)(600163)", "EXE ID": "65", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Ramjanki Road to Kaptanganj", "Beat id": "922", "Executive and PSR": "Anadi Krishn(SE)(600163)", "EXE ID": "65", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Ramjanki Road to Maharajganj", "Beat id": "923", "Executive and PSR": "Anadi Krishn(SE)(600163)", "EXE ID": "65", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Ramjanki Road to Pipra", "Beat id": "924", "Executive and PSR": "Anadi Krishn(SE)(600163)", "EXE ID": "65", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Barhaj road to tikhwa", "Beat id": "237", "Executive and PSR": "Prashant Singh(SE)(600178)", "EXE ID": "83", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Barhaj to Bhagalpur", "Beat id": "302", "Executive and PSR": "Prashant Singh(SE)(600178)", "EXE ID": "83", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Bhatparrani road to Bangra", "Beat id": "913", "Executive and PSR": "Prashant Singh(SE)(600178)", "EXE ID": "83", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Bhatparrani road to Bhavani Chapar", "Beat id": "910", "Executive and PSR": "Prashant Singh(SE)(600178)", "EXE ID": "83", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Bhatparrani road to Ghati", "Beat id": "912", "Executive and PSR": "Prashant Singh(SE)(600178)", "EXE ID": "83", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Bhatparrani road to Pindi", "Beat id": "911", "Executive and PSR": "Prashant Singh(SE)(600178)", "EXE ID": "83", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Bhatparrani road to Pratap pur Factory", "Beat id": "909", "Executive and PSR": "Prashant Singh(SE)(600178)", "EXE ID": "83", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Deoria to Baikunthpur", "Beat id": "694", "Executive and PSR": "Prashant Singh(SE)(600178)", "EXE ID": "83", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Deoria to Batni", "Beat id": "693", "Executive and PSR": "Prashant Singh(SE)(600178)", "EXE ID": "83", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Deoria to Bhatparrani road", "Beat id": "574", "Executive and PSR": "Prashant Singh(SE)(600178)", "EXE ID": "83", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Deoria to Patherdeva", "Beat id": "692", "Executive and PSR": "Prashant Singh(SE)(600178)", "EXE ID": "83", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Deoria To Ram Lakchan road", "Beat id": "573", "Executive and PSR": "Prashant Singh(SE)(600178)", "EXE ID": "83", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Deoria to salenpur road", "Beat id": "362", "Executive and PSR": "Prashant Singh(SE)(600178)", "EXE ID": "83", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Rudrapur to Barhaj road 1", "Beat id": "457", "Executive and PSR": "Prashant Singh(SE)(600178)", "EXE ID": "83", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Rudrapur to Barhaj road 2", "Beat id": "460", "Executive and PSR": "Prashant Singh(SE)(600178)", "EXE ID": "83", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Rudrapur to deoria", "Beat id": "458", "Executive and PSR": "Prashant Singh(SE)(600178)", "EXE ID": "83", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Rudrapur to deoria 2", "Beat id": "459", "Executive and PSR": "Prashant Singh(SE)(600178)", "EXE ID": "83", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Rudrapur To Narayanpur Road", "Beat id": "462", "Executive and PSR": "Prashant Singh(SE)(600178)", "EXE ID": "83", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Rudrapur To Pachladi Road 1", "Beat id": "463", "Executive and PSR": "Prashant Singh(SE)(600178)", "EXE ID": "83", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Rudrapur To Pachladi Road 2", "Beat id": "464", "Executive and PSR": "Prashant Singh(SE)(600178)", "EXE ID": "83", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Chari Chavra to Sardarnagar", "Beat id": "351", "Executive and PSR": "Vinay Kumar Dubey(SE)(600217)", "EXE ID": "99", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Gorakhpur to Barahalganj", "Beat id": "585", "Executive and PSR": "Vinay Kumar Dubey(SE)(600217)", "EXE ID": "99", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Gorakhpur to Chari Chavra", "Beat id": "381", "Executive and PSR": "Vinay Kumar Dubey(SE)(600217)", "EXE ID": "99", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Gorakhpur to Gagha", "Beat id": "560", "Executive and PSR": "Vinay Kumar Dubey(SE)(600217)", "EXE ID": "99", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Gorakhpur to Gola", "Beat id": "608", "Executive and PSR": "Vinay Kumar Dubey(SE)(600217)", "EXE ID": "99", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Gorakhpur to Kaudiram", "Beat id": "558", "Executive and PSR": "Vinay Kumar Dubey(SE)(600217)", "EXE ID": "99", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Gorakhpur to Khajani", "Beat id": "349", "Executive and PSR": "Vinay Kumar Dubey(SE)(600217)", "EXE ID": "99", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Gorakhpur to Mithabel", "Beat id": "915", "Executive and PSR": "Vinay Kumar Dubey(SE)(600217)", "EXE ID": "99", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Gorakhpur to Nai Bazar", "Beat id": "914", "Executive and PSR": "Vinay Kumar Dubey(SE)(600217)", "EXE ID": "99", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Gorakhpur to Urwa bazar", "Beat id": "557", "Executive and PSR": "Vinay Kumar Dubey(SE)(600217)", "EXE ID": "99", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Tamkuhi Raj to Kasia", "Beat id": "484", "Executive and PSR": "Vinay Kumar Dubey(SE)(600217)", "EXE ID": "99", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Tamkuhi Raj to Padrauna", "Beat id": "485", "Executive and PSR": "Vinay Kumar Dubey(SE)(600217)", "EXE ID": "99", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Tamkuhi Raj to Salemgarh", "Beat id": "486", "Executive and PSR": "Vinay Kumar Dubey(SE)(600217)", "EXE ID": "99", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Bagh Nagar to Karmani ghat", "Beat id": "271", "Executive and PSR": "Jeevesh Chandra(SE)(600251)", "EXE ID": "175", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Khalila bad to Pauli", "Beat id": "407", "Executive and PSR": "Jeevesh Chandra(SE)(600251)", "EXE ID": "175", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Khalilabad To Bakhira", "Beat id": "552", "Executive and PSR": "Jeevesh Chandra(SE)(600251)", "EXE ID": "175", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Khalilabad To Haisar Bazar", "Beat id": "553", "Executive and PSR": "Jeevesh Chandra(SE)(600251)", "EXE ID": "175", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Khalilabad to Mahuli", "Beat id": "687", "Executive and PSR": "Jeevesh Chandra(SE)(600251)", "EXE ID": "175", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Khalilabad to Nathnagar", "Beat id": "621", "Executive and PSR": "Jeevesh Chandra(SE)(600251)", "EXE ID": "175", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Khalilabad to Samariyava", "Beat id": "551", "Executive and PSR": "Jeevesh Chandra(SE)(600251)", "EXE ID": "175", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Samariyava to Mehdawal", "Beat id": "550", "Executive and PSR": "Jeevesh Chandra(SE)(600251)", "EXE ID": "175", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Hata", "Beat id": "857", "Executive and PSR": "Bhagirathi Sharma(SE)(600270)", "EXE ID": "177", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Kushinagar to Padruna", "Beat id": "897", "Executive and PSR": "Bhagirathi Sharma(SE)(600270)", "EXE ID": "177", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Padrauna to Dudehi", "Beat id": "434", "Executive and PSR": "Bhagirathi Sharma(SE)(600270)", "EXE ID": "177", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Padrauna to Fajilnagar", "Beat id": "435", "Executive and PSR": "Bhagirathi Sharma(SE)(600270)", "EXE ID": "177", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Padrauna to Kaptanganj", "Beat id": "436", "Executive and PSR": "Bhagirathi Sharma(SE)(600270)", "EXE ID": "177", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Padrauna to Kashya 1", "Beat id": "437", "Executive and PSR": "Bhagirathi Sharma(SE)(600270)", "EXE ID": "177", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Padrauna to Kashya 2", "Beat id": "438", "Executive and PSR": "Bhagirathi Sharma(SE)(600270)", "EXE ID": "177", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Padrauna to Patherwa", "Beat id": "439", "Executive and PSR": "Bhagirathi Sharma(SE)(600270)", "EXE ID": "177", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Padrauna to Ramkola", "Beat id": "440", "Executive and PSR": "Bhagirathi Sharma(SE)(600270)", "EXE ID": "177", "PSR": "", "PSR ID": "", "ASM": "Ashish Srivastava"},
+{"Beat name": "Baripal To Ghatampur", "Beat id": "305", "Executive and PSR": "Surya Prakash Awasthi (SE)(600249)", "EXE ID": "64", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Baripal To Nauranga", "Beat id": "629", "Executive and PSR": "Surya Prakash Awasthi (SE)(600249)", "EXE ID": "64", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Baripal To Nawranga", "Beat id": "641", "Executive and PSR": "Surya Prakash Awasthi (SE)(600249)", "EXE ID": "64", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Baripal To Paras", "Beat id": "631", "Executive and PSR": "Surya Prakash Awasthi (SE)(600249)", "EXE ID": "64", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Baripal To Shreenagar", "Beat id": "628", "Executive and PSR": "Surya Prakash Awasthi (SE)(600249)", "EXE ID": "64", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Bheetargaon to Patara", "Beat id": "916", "Executive and PSR": "Surya Prakash Awasthi (SE)(600249)", "EXE ID": "64", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Bheetargaon to Saadh", "Beat id": "526", "Executive and PSR": "Surya Prakash Awasthi (SE)(600249)", "EXE ID": "64", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Bheetargaon To Taus", "Beat id": "327", "Executive and PSR": "Surya Prakash Awasthi (SE)(600249)", "EXE ID": "64", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Kudni to sagh", "Beat id": "632", "Executive and PSR": "Surya Prakash Awasthi (SE)(600249)", "EXE ID": "64", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Patara to ghatampur", "Beat id": "597", "Executive and PSR": "Surya Prakash Awasthi (SE)(600249)", "EXE ID": "64", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Patara To Navedi", "Beat id": "630", "Executive and PSR": "Surya Prakash Awasthi (SE)(600249)", "EXE ID": "64", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Ramadevi to sarsaul", "Beat id": "633", "Executive and PSR": "Surya Prakash Awasthi (SE)(600249)", "EXE ID": "64", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Ramaipur to Sidhi", "Beat id": "612", "Executive and PSR": "Surya Prakash Awasthi (SE)(600249)", "EXE ID": "64", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Saad to Narwal", "Beat id": "639", "Executive and PSR": "Surya Prakash Awasthi (SE)(600249)", "EXE ID": "64", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Shivrajpur to Bilhaur", "Beat id": "614", "Executive and PSR": "Surya Prakash Awasthi (SE)(600249)", "EXE ID": "64", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Shivrajpur to Bithoor", "Beat id": "596", "Executive and PSR": "Surya Prakash Awasthi (SE)(600249)", "EXE ID": "64", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Shivrajpur to Jagdishpur", "Beat id": "613", "Executive and PSR": "Surya Prakash Awasthi (SE)(600249)", "EXE ID": "64", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Shivrajpur to Kakwan", "Beat id": "622", "Executive and PSR": "Surya Prakash Awasthi (SE)(600249)", "EXE ID": "64", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Shivrajpur to Makarpur", "Beat id": "747", "Executive and PSR": "Surya Prakash Awasthi (SE)(600249)", "EXE ID": "64", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Shivrajpur to Sakrej", "Beat id": "640", "Executive and PSR": "Surya Prakash Awasthi (SE)(600249)", "EXE ID": "64", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Shivrajpur to Uttripura", "Beat id": "711", "Executive and PSR": "Surya Prakash Awasthi (SE)(600249)", "EXE ID": "64", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Shivrajpur to Vishdhan", "Beat id": "728", "Executive and PSR": "Surya Prakash Awasthi (SE)(600249)", "EXE ID": "64", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Uttripura To Choubeypur", "Beat id": "518", "Executive and PSR": "Surya Prakash Awasthi (SE)(600249)", "EXE ID": "64", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Maitha station to Bhaupur", "Beat id": "422", "Executive and PSR": "Brijesh Kumar Pal(SE)(600140)", "EXE ID": "70", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Maitha station to Mathurapurwa", "Beat id": "423", "Executive and PSR": "Brijesh Kumar Pal(SE)(600140)", "EXE ID": "70", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Rasoolabad To Bhewan", "Beat id": "455", "Executive and PSR": "Brijesh Kumar Pal(SE)(600140)", "EXE ID": "70", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Rasoolabad To Jhinjhak 1", "Beat id": "452", "Executive and PSR": "Brijesh Kumar Pal(SE)(600140)", "EXE ID": "70", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Rasoolabad to kahinjhari", "Beat id": "598", "Executive and PSR": "Brijesh Kumar Pal(SE)(600140)", "EXE ID": "70", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Rasoolabad To Kakwan", "Beat id": "451", "Executive and PSR": "Brijesh Kumar Pal(SE)(600140)", "EXE ID": "70", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Rasoolabad to Lehrapur", "Beat id": "601", "Executive and PSR": "Brijesh Kumar Pal(SE)(600140)", "EXE ID": "70", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Rasoolabad To Machpatiyan", "Beat id": "454", "Executive and PSR": "Brijesh Kumar Pal(SE)(600140)", "EXE ID": "70", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Rasoolabad To Mindakua", "Beat id": "453", "Executive and PSR": "Brijesh Kumar Pal(SE)(600140)", "EXE ID": "70", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Rasoolabad to Naar", "Beat id": "600", "Executive and PSR": "Brijesh Kumar Pal(SE)(600140)", "EXE ID": "70", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Rasoolabad to Vishdhan", "Beat id": "599", "Executive and PSR": "Brijesh Kumar Pal(SE)(600140)", "EXE ID": "70", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Rasoolabad To Yakoobpur", "Beat id": "450", "Executive and PSR": "Brijesh Kumar Pal(SE)(600140)", "EXE ID": "70", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Rura To Banipara", "Beat id": "465", "Executive and PSR": "Brijesh Kumar Pal(SE)(600140)", "EXE ID": "70", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Rura To Derapur", "Beat id": "363", "Executive and PSR": "Brijesh Kumar Pal(SE)(600140)", "EXE ID": "70", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Rura to Muktapur", "Beat id": "602", "Executive and PSR": "Brijesh Kumar Pal(SE)(600140)", "EXE ID": "70", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Bahawalpur To Chibramau", "Beat id": "101", "Executive and PSR": "Kushmesh Kumar(SE)(600237)", "EXE ID": "76", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Bahawalpur To Gurshaiganj", "Beat id": "102", "Executive and PSR": "Kushmesh Kumar(SE)(600237)", "EXE ID": "76", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Bahawalpur to Haseran", "Beat id": "275", "Executive and PSR": "Kushmesh Kumar(SE)(600237)", "EXE ID": "76", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Bahawalpur To Saurikh", "Beat id": "276", "Executive and PSR": "Kushmesh Kumar(SE)(600237)", "EXE ID": "76", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Bahawalpur To Talgram", "Beat id": "103", "Executive and PSR": "Kushmesh Kumar(SE)(600237)", "EXE ID": "76", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Bhadurpur to Usharahar", "Beat id": "323", "Executive and PSR": "Kushmesh Kumar(SE)(600237)", "EXE ID": "76", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Bhaulpur to Vishungarh", "Beat id": "326", "Executive and PSR": "Kushmesh Kumar(SE)(600237)", "EXE ID": "76", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Kannauj To Indergarh", "Beat id": "404", "Executive and PSR": "Kushmesh Kumar(SE)(600237)", "EXE ID": "76", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Kannauj To Thatiya", "Beat id": "405", "Executive and PSR": "Kushmesh Kumar(SE)(600237)", "EXE ID": "76", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Malikpur to Gurshaiganj", "Beat id": "424", "Executive and PSR": "Kushmesh Kumar(SE)(600237)", "EXE ID": "76", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Malikpur To Khudaganj", "Beat id": "425", "Executive and PSR": "Kushmesh Kumar(SE)(600237)", "EXE ID": "76", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Malikpur To Singhpur/Bhaisiyapur", "Beat id": "426", "Executive and PSR": "Kushmesh Kumar(SE)(600237)", "EXE ID": "76", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Malikpur To Talgram", "Beat id": "427", "Executive and PSR": "Kushmesh Kumar(SE)(600237)", "EXE ID": "76", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Saurikh to Chhibramau", "Beat id": "471", "Executive and PSR": "Kushmesh Kumar(SE)(600237)", "EXE ID": "76", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Saurikh to Daultabad", "Beat id": "474", "Executive and PSR": "Kushmesh Kumar(SE)(600237)", "EXE ID": "76", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Saurikh to Khadini", "Beat id": "472", "Executive and PSR": "Kushmesh Kumar(SE)(600237)", "EXE ID": "76", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Saurikh to Nademau", "Beat id": "473", "Executive and PSR": "Kushmesh Kumar(SE)(600237)", "EXE ID": "76", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Saurikh to Sakrawa", "Beat id": "100", "Executive and PSR": "Kushmesh Kumar(SE)(600237)", "EXE ID": "76", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Thatiya To Jhabua", "Beat id": "104", "Executive and PSR": "Kushmesh Kumar(SE)(600237)", "EXE ID": "76", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Thatiya To Kannauj", "Beat id": "105", "Executive and PSR": "Kushmesh Kumar(SE)(600237)", "EXE ID": "76", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Thatiya To Sursi (paliya)", "Beat id": "106", "Executive and PSR": "Kushmesh Kumar(SE)(600237)", "EXE ID": "76", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Thatiya To Tirva road", "Beat id": "107", "Executive and PSR": "Kushmesh Kumar(SE)(600237)", "EXE ID": "76", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Tirwa To Indergarh", "Beat id": "108", "Executive and PSR": "Kushmesh Kumar(SE)(600237)", "EXE ID": "76", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Tirwa To Kannauj", "Beat id": "109", "Executive and PSR": "Kushmesh Kumar(SE)(600237)", "EXE ID": "76", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Tirwa To Umerda", "Beat id": "110", "Executive and PSR": "Kushmesh Kumar(SE)(600237)", "EXE ID": "76", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Tirwha To Khairnagar Road", "Beat id": "496", "Executive and PSR": "Kushmesh Kumar(SE)(600237)", "EXE ID": "76", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Umarda to Bela", "Beat id": "500", "Executive and PSR": "Kushmesh Kumar(SE)(600237)", "EXE ID": "76", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Umarda to Indragarh ( Haraulpurva road)", "Beat id": "501", "Executive and PSR": "Kushmesh Kumar(SE)(600237)", "EXE ID": "76", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Umarda to Liluaiya", "Beat id": "112", "Executive and PSR": "Kushmesh Kumar(SE)(600237)", "EXE ID": "76", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Umarda to Sarouli", "Beat id": "111", "Executive and PSR": "Kushmesh Kumar(SE)(600237)", "EXE ID": "76", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Astu to Ajeetmal", "Beat id": "858", "Executive and PSR": "Prem Kumar(SE)(600235)", "EXE ID": "84", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Astu to Ballapur", "Beat id": "928", "Executive and PSR": "Prem Kumar(SE)(600235)", "EXE ID": "84", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Astu to chimkuni", "Beat id": "896", "Executive and PSR": "Prem Kumar(SE)(600235)", "EXE ID": "84", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Atsu to Achalda", "Beat id": "267", "Executive and PSR": "Prem Kumar(SE)(600235)", "EXE ID": "84", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Atsu to Anantram", "Beat id": "869", "Executive and PSR": "Prem Kumar(SE)(600235)", "EXE ID": "84", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Atsu to Ayana", "Beat id": "867", "Executive and PSR": "Prem Kumar(SE)(600235)", "EXE ID": "84", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Atsu to Ghasara", "Beat id": "868", "Executive and PSR": "Prem Kumar(SE)(600235)", "EXE ID": "84", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Atsu to Phapund", "Beat id": "268", "Executive and PSR": "Prem Kumar(SE)(600235)", "EXE ID": "84", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Auraiya To Auraiya", "Beat id": "716", "Executive and PSR": "Prem Kumar(SE)(600235)", "EXE ID": "84", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Banthra Bazar", "Beat id": "672", "Executive and PSR": "Prem Kumar(SE)(600235)", "EXE ID": "84", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Behlupur to kanchausi", "Beat id": "317", "Executive and PSR": "Prem Kumar(SE)(600235)", "EXE ID": "84", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Behlupur to Yakoobpur", "Beat id": "537", "Executive and PSR": "Prem Kumar(SE)(600235)", "EXE ID": "84", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Belhupur to Sahar", "Beat id": "683", "Executive and PSR": "Prem Kumar(SE)(600235)", "EXE ID": "84", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Bhudhadana to Kanchosi", "Beat id": "332", "Executive and PSR": "Prem Kumar(SE)(600235)", "EXE ID": "84", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Bidhuna to Achalda", "Beat id": "333", "Executive and PSR": "Prem Kumar(SE)(600235)", "EXE ID": "84", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Bidhuna to Airva Katra", "Beat id": "335", "Executive and PSR": "Prem Kumar(SE)(600235)", "EXE ID": "84", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Bidhuna to Bela", "Beat id": "336", "Executive and PSR": "Prem Kumar(SE)(600235)", "EXE ID": "84", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Bidhuna to kudarkoot", "Beat id": "337", "Executive and PSR": "Prem Kumar(SE)(600235)", "EXE ID": "84", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Bidhuna to Sahar", "Beat id": "338", "Executive and PSR": "Prem Kumar(SE)(600235)", "EXE ID": "84", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Budadana to Auraiya", "Beat id": "347", "Executive and PSR": "Prem Kumar(SE)(600235)", "EXE ID": "84", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Budadana to Bhersen", "Beat id": "732", "Executive and PSR": "Prem Kumar(SE)(600235)", "EXE ID": "84", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Budadana To Chiruhli", "Beat id": "737", "Executive and PSR": "Prem Kumar(SE)(600235)", "EXE ID": "84", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Budadana to Dibiyapur", "Beat id": "731", "Executive and PSR": "Prem Kumar(SE)(600235)", "EXE ID": "84", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Budadana to Phapund", "Beat id": "710", "Executive and PSR": "Prem Kumar(SE)(600235)", "EXE ID": "84", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Budadana to Sallapur", "Beat id": "794", "Executive and PSR": "Prem Kumar(SE)(600235)", "EXE ID": "84", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Budhadana to Baisundra", "Beat id": "718", "Executive and PSR": "Prem Kumar(SE)(600235)", "EXE ID": "84", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Budhadana to Kyotra", "Beat id": "719", "Executive and PSR": "Prem Kumar(SE)(600235)", "EXE ID": "84", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Dabra to Bhiterwar", "Beat id": "352", "Executive and PSR": "Vimal Kumar Singh(SE)(600227)", "EXE ID": "98", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Dabra to Biloua", "Beat id": "712", "Executive and PSR": "Vimal Kumar Singh(SE)(600227)", "EXE ID": "98", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Dabra to Chimmak", "Beat id": "353", "Executive and PSR": "Vimal Kumar Singh(SE)(600227)", "EXE ID": "98", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Dabra to Dabra", "Beat id": "836", "Executive and PSR": "Vimal Kumar Singh(SE)(600227)", "EXE ID": "98", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Dabra to Dabra Market", "Beat id": "354", "Executive and PSR": "Vimal Kumar Singh(SE)(600227)", "EXE ID": "98", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Dabra to pichore Goraghat", "Beat id": "835", "Executive and PSR": "Vimal Kumar Singh(SE)(600227)", "EXE ID": "98", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Dabra to Sonagiri", "Beat id": "930", "Executive and PSR": "Vimal Kumar Singh(SE)(600227)", "EXE ID": "98", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Dabra to tecanpur", "Beat id": "834", "Executive and PSR": "Vimal Kumar Singh(SE)(600227)", "EXE ID": "98", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Gwalior to Behat", "Beat id": "653", "Executive and PSR": "Vimal Kumar Singh(SE)(600227)", "EXE ID": "98", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Gwalior to Dabra to Pichore", "Beat id": "355", "Executive and PSR": "Vimal Kumar Singh(SE)(600227)", "EXE ID": "98", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Gwalior To Girvai", "Beat id": "607", "Executive and PSR": "Vimal Kumar Singh(SE)(600227)", "EXE ID": "98", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Gwalior to Gohad", "Beat id": "590", "Executive and PSR": "Vimal Kumar Singh(SE)(600227)", "EXE ID": "98", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Gwalior to Gormi", "Beat id": "833", "Executive and PSR": "Vimal Kumar Singh(SE)(600227)", "EXE ID": "98", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Gwalior to Gwalior", "Beat id": "523", "Executive and PSR": "Vimal Kumar Singh(SE)(600227)", "EXE ID": "98", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Gwalior to Hazira", "Beat id": "588", "Executive and PSR": "Vimal Kumar Singh(SE)(600227)", "EXE ID": "98", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Gwalior To Moh", "Beat id": "524", "Executive and PSR": "Vimal Kumar Singh(SE)(600227)", "EXE ID": "98", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Gwalior to Murar cantt area", "Beat id": "589", "Executive and PSR": "Vimal Kumar Singh(SE)(600227)", "EXE ID": "98", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Gwalior to Murar Sadar", "Beat id": "866", "Executive and PSR": "Vimal Kumar Singh(SE)(600227)", "EXE ID": "98", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Gwalior To Panihar", "Beat id": "886", "Executive and PSR": "Vimal Kumar Singh(SE)(600227)", "EXE ID": "98", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Porsa To Ambha", "Beat id": "446", "Executive and PSR": "Vimal Kumar Singh(SE)(600227)", "EXE ID": "98", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Porsa To Gormi", "Beat id": "447", "Executive and PSR": "Vimal Kumar Singh(SE)(600227)", "EXE ID": "98", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Porsa To Porsa Market", "Beat id": "448", "Executive and PSR": "Vimal Kumar Singh(SE)(600227)", "EXE ID": "98", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Bathpura", "Beat id": "679", "Executive and PSR": "Vivek Singh(SE)(600228)", "EXE ID": "100", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Bhadurpur to Bharthana", "Beat id": "322", "Executive and PSR": "Vivek Singh(SE)(600228)", "EXE ID": "100", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Bharthana to Bakewar Anantram", "Beat id": "324", "Executive and PSR": "Vivek Singh(SE)(600228)", "EXE ID": "100", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Bharthana to Safai", "Beat id": "325", "Executive and PSR": "Vivek Singh(SE)(600228)", "EXE ID": "100", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Etawah to Badpura", "Beat id": "686", "Executive and PSR": "Vivek Singh(SE)(600228)", "EXE ID": "100", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Etawah To Bakewar Lakhna", "Beat id": "371", "Executive and PSR": "Vivek Singh(SE)(600228)", "EXE ID": "100", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Etawah to Barthana", "Beat id": "606", "Executive and PSR": "Vivek Singh(SE)(600228)", "EXE ID": "100", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Etawah To Charaknagar", "Beat id": "372", "Executive and PSR": "Vivek Singh(SE)(600228)", "EXE ID": "100", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Etawah To Jaswant Nagar", "Beat id": "373", "Executive and PSR": "Vivek Singh(SE)(600228)", "EXE ID": "100", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Etawah To Safai", "Beat id": "374", "Executive and PSR": "Vivek Singh(SE)(600228)", "EXE ID": "100", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Samthar to Chhopla", "Beat id": "839", "Executive and PSR": "Vivek Singh(SE)(600228)", "EXE ID": "100", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Ushrahar To Eatwah", "Beat id": "515", "Executive and PSR": "Vivek Singh(SE)(600228)", "EXE ID": "100", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Usrahar to Baraha", "Beat id": "862", "Executive and PSR": "Vivek Singh(SE)(600228)", "EXE ID": "100", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Usrahar To Bidhuna", "Beat id": "516", "Executive and PSR": "Vivek Singh(SE)(600228)", "EXE ID": "100", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Usrahar to Karri", "Beat id": "861", "Executive and PSR": "Vivek Singh(SE)(600228)", "EXE ID": "100", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Usrahar to Kauta sariya", "Beat id": "864", "Executive and PSR": "Vivek Singh(SE)(600228)", "EXE ID": "100", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Usrahar to kudrail", "Beat id": "885", "Executive and PSR": "Vivek Singh(SE)(600228)", "EXE ID": "100", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Usrahar To Safai", "Beat id": "517", "Executive and PSR": "Vivek Singh(SE)(600228)", "EXE ID": "100", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Usrahar To Santhar", "Beat id": "852", "Executive and PSR": "Vivek Singh(SE)(600228)", "EXE ID": "100", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Usrahar to Takha", "Beat id": "889", "Executive and PSR": "Vivek Singh(SE)(600228)", "EXE ID": "100", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Usrahar To Umrain marg", "Beat id": "853", "Executive and PSR": "Vivek Singh(SE)(600228)", "EXE ID": "100", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Usrahar To vahebamarg", "Beat id": "831", "Executive and PSR": "Vivek Singh(SE)(600228)", "EXE ID": "100", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Auras To Harauni (Mohaan)", "Beat id": "269", "Executive and PSR": "Kamlesh Katheria(SE)(600267)", "EXE ID": "173", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Bangarmau To Bilhaore (Utripura)", "Beat id": "296", "Executive and PSR": "Kamlesh Katheria(SE)(600267)", "EXE ID": "173", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Bangarmau To Fatehpur Chaurashi", "Beat id": "297", "Executive and PSR": "Kamlesh Katheria(SE)(600267)", "EXE ID": "173", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Bangarmau To Gauria Kala", "Beat id": "298", "Executive and PSR": "Kamlesh Katheria(SE)(600267)", "EXE ID": "173", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Bangarmau To Hardoi Road", "Beat id": "299", "Executive and PSR": "Kamlesh Katheria(SE)(600267)", "EXE ID": "173", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Bangarmau To Safipur", "Beat id": "300", "Executive and PSR": "Kamlesh Katheria(SE)(600267)", "EXE ID": "173", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Bangarmau To Sandila Road", "Beat id": "301", "Executive and PSR": "Kamlesh Katheria(SE)(600267)", "EXE ID": "173", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Unnai To Aurush_Harsena", "Beat id": "505", "Executive and PSR": "Kamlesh Katheria(SE)(600267)", "EXE ID": "173", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Unnao To Auras 2", "Beat id": "506", "Executive and PSR": "Kamlesh Katheria(SE)(600267)", "EXE ID": "173", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Unnao To Aurash", "Beat id": "507", "Executive and PSR": "Kamlesh Katheria(SE)(600267)", "EXE ID": "173", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Unnao to Barithana miyaganj", "Beat id": "508", "Executive and PSR": "Kamlesh Katheria(SE)(600267)", "EXE ID": "173", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Unnao To Biswal", "Beat id": "509", "Executive and PSR": "Kamlesh Katheria(SE)(600267)", "EXE ID": "173", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Unnao To Chakalvansi Paria", "Beat id": "510", "Executive and PSR": "Kamlesh Katheria(SE)(600267)", "EXE ID": "173", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Unnao To Hasanganj", "Beat id": "511", "Executive and PSR": "Kamlesh Katheria(SE)(600267)", "EXE ID": "173", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Unnao to Safipur", "Beat id": "512", "Executive and PSR": "Kamlesh Katheria(SE)(600267)", "EXE ID": "173", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Unnao To Safipur (Pawa)", "Beat id": "513", "Executive and PSR": "Kamlesh Katheria(SE)(600267)", "EXE ID": "173", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Unnao To Takia Gurdhari", "Beat id": "514", "Executive and PSR": "Kamlesh Katheria(SE)(600267)", "EXE ID": "173", "PSR": "", "PSR ID": "", "ASM": "Dipendra Singh"},
+{"Beat name": "Barhani", "Beat id": "845", "Executive and PSR": "Bijay Kumar Prasad(SE)(600256)", "EXE ID": "152", "PSR": "", "PSR ID": "", "ASM": "Man Singh"},
+{"Beat name": "Bhorey", "Beat id": "846", "Executive and PSR": "Bijay Kumar Prasad(SE)(600256)", "EXE ID": "152", "PSR": "", "PSR ID": "", "ASM": "Man Singh"},
+{"Beat name": "Katiya", "Beat id": "849", "Executive and PSR": "Bijay Kumar Prasad(SE)(600256)", "EXE ID": "152", "PSR": "", "PSR ID": "", "ASM": "Man Singh"},
+{"Beat name": "Sidhawaliya", "Beat id": "847", "Executive and PSR": "Bijay Kumar Prasad(SE)(600256)", "EXE ID": "152", "PSR": "", "PSR ID": "", "ASM": "Man Singh"},
+{"Beat name": "Siwan Sadar", "Beat id": "848", "Executive and PSR": "Bijay Kumar Prasad(SE)(600256)", "EXE ID": "152", "PSR": "", "PSR ID": "", "ASM": "Man Singh"},
+{"Beat name": "Biddupur", "Beat id": "726", "Executive and PSR": "Navneet Kumar(SE)(600255)", "EXE ID": "153", "PSR": "", "PSR ID": "", "ASM": "Man Singh"},
+{"Beat name": "Desri", "Beat id": "708", "Executive and PSR": "Navneet Kumar(SE)(600255)", "EXE ID": "153", "PSR": "", "PSR ID": "", "ASM": "Man Singh"},
+{"Beat name": "Jandaha", "Beat id": "730", "Executive and PSR": "Navneet Kumar(SE)(600255)", "EXE ID": "153", "PSR": "", "PSR ID": "", "ASM": "Man Singh"},
+{"Beat name": "Mahua", "Beat id": "729", "Executive and PSR": "Navneet Kumar(SE)(600255)", "EXE ID": "153", "PSR": "", "PSR ID": "", "ASM": "Man Singh"},
+{"Beat name": "Bibhutipur", "Beat id": "705", "Executive and PSR": "Rahul Kumar(SE)(600254)", "EXE ID": "154", "PSR": "", "PSR ID": "", "ASM": "Man Singh"},
+{"Beat name": "Dalsinghsarai", "Beat id": "698", "Executive and PSR": "Rahul Kumar(SE)(600254)", "EXE ID": "154", "PSR": "", "PSR ID": "", "ASM": "Man Singh"},
+{"Beat name": "Khanpur", "Beat id": "703", "Executive and PSR": "Rahul Kumar(SE)(600254)", "EXE ID": "154", "PSR": "", "PSR ID": "", "ASM": "Man Singh"},
+{"Beat name": "Morva", "Beat id": "707", "Executive and PSR": "Rahul Kumar(SE)(600254)", "EXE ID": "154", "PSR": "", "PSR ID": "", "ASM": "Man Singh"},
+{"Beat name": "Patori", "Beat id": "704", "Executive and PSR": "Rahul Kumar(SE)(600254)", "EXE ID": "154", "PSR": "", "PSR ID": "", "ASM": "Man Singh"},
+{"Beat name": "Samastipur", "Beat id": "706", "Executive and PSR": "Rahul Kumar(SE)(600254)", "EXE ID": "154", "PSR": "", "PSR ID": "", "ASM": "Man Singh"},
+{"Beat name": "Sarairanjan", "Beat id": "702", "Executive and PSR": "Rahul Kumar(SE)(600254)", "EXE ID": "154", "PSR": "", "PSR ID": "", "ASM": "Man Singh"},
+{"Beat name": "Tajpur", "Beat id": "701", "Executive and PSR": "Rahul Kumar(SE)(600254)", "EXE ID": "154", "PSR": "", "PSR ID": "", "ASM": "Man Singh"},
+{"Beat name": "Ujaiyarpur", "Beat id": "699", "Executive and PSR": "Rahul Kumar(SE)(600254)", "EXE ID": "154", "PSR": "", "PSR ID": "", "ASM": "Man Singh"},
+{"Beat name": "Vidya Pati", "Beat id": "700", "Executive and PSR": "Rahul Kumar(SE)(600254)", "EXE ID": "154", "PSR": "", "PSR ID": "", "ASM": "Man Singh"},
+{"Beat name": "Ikauna to Bhinga", "Beat id": "525", "Executive and PSR": "Abhay Tiwari(SE)(600188)", "EXE ID": "56", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Ikawna to Malhipur", "Beat id": "529", "Executive and PSR": "Abhay Tiwari(SE)(600188)", "EXE ID": "56", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Semri To Bhinga", "Beat id": "528", "Executive and PSR": "Abhay Tiwari(SE)(600188)", "EXE ID": "56", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Semri to Chetiya Murar", "Beat id": "563", "Executive and PSR": "Abhay Tiwari(SE)(600188)", "EXE ID": "56", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Semri To Ikauna", "Beat id": "561", "Executive and PSR": "Abhay Tiwari(SE)(600188)", "EXE ID": "56", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Semri to Laxman nagar", "Beat id": "562", "Executive and PSR": "Abhay Tiwari(SE)(600188)", "EXE ID": "56", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Bahraich To Bagwanpur", "Beat id": "278", "Executive and PSR": "Harshit Julius(SE)(600168)", "EXE ID": "75", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Bahraich To barnapur", "Beat id": "279", "Executive and PSR": "Harshit Julius(SE)(600168)", "EXE ID": "75", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Bahraich To Bhinga 1", "Beat id": "280", "Executive and PSR": "Harshit Julius(SE)(600168)", "EXE ID": "75", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Bahraich To Bhinga 2", "Beat id": "281", "Executive and PSR": "Harshit Julius(SE)(600168)", "EXE ID": "75", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Bahraich To Gilawala", "Beat id": "282", "Executive and PSR": "Harshit Julius(SE)(600168)", "EXE ID": "75", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Bahraich To laksmanagar", "Beat id": "283", "Executive and PSR": "Harshit Julius(SE)(600168)", "EXE ID": "75", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Bahraich to Mahipurva", "Beat id": "284", "Executive and PSR": "Harshit Julius(SE)(600168)", "EXE ID": "75", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Bahraich To Mallipur", "Beat id": "285", "Executive and PSR": "Harshit Julius(SE)(600168)", "EXE ID": "75", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Bahraich to Massi", "Beat id": "286", "Executive and PSR": "Harshit Julius(SE)(600168)", "EXE ID": "75", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Bahraich to Matera", "Beat id": "287", "Executive and PSR": "Harshit Julius(SE)(600168)", "EXE ID": "75", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Bahraich To Nanpara", "Beat id": "288", "Executive and PSR": "Harshit Julius(SE)(600168)", "EXE ID": "75", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Bahraich To Nanpara 2", "Beat id": "289", "Executive and PSR": "Harshit Julius(SE)(600168)", "EXE ID": "75", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Bahraich to Napalganj", "Beat id": "290", "Executive and PSR": "Harshit Julius(SE)(600168)", "EXE ID": "75", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Bahraich to Prayagpur", "Beat id": "291", "Executive and PSR": "Harshit Julius(SE)(600168)", "EXE ID": "75", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Bahraich to Rupaidiha", "Beat id": "292", "Executive and PSR": "Harshit Julius(SE)(600168)", "EXE ID": "75", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Behraich To Fakarpur", "Beat id": "318", "Executive and PSR": "Harshit Julius(SE)(600168)", "EXE ID": "75", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Behraich To Kaisarganj 2", "Beat id": "319", "Executive and PSR": "Harshit Julius(SE)(600168)", "EXE ID": "75", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Behraich To Kesarganj", "Beat id": "320", "Executive and PSR": "Harshit Julius(SE)(600168)", "EXE ID": "75", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Behraich To Pakharpur", "Beat id": "321", "Executive and PSR": "Harshit Julius(SE)(600168)", "EXE ID": "75", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Gajadharpur to Kaiserganj", "Beat id": "377", "Executive and PSR": "Harshit Julius(SE)(600168)", "EXE ID": "75", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Gajadharpur to Risia", "Beat id": "378", "Executive and PSR": "Harshit Julius(SE)(600168)", "EXE ID": "75", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Barinbagh To Bhelsar_Road", "Beat id": "304", "Executive and PSR": "Saurabh Tripathi(SE)(600234)", "EXE ID": "88", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Barinbagh to Patranga", "Beat id": "725", "Executive and PSR": "Saurabh Tripathi(SE)(600234)", "EXE ID": "88", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Bhetariya To Safdarganj", "Beat id": "328", "Executive and PSR": "Saurabh Tripathi(SE)(600234)", "EXE ID": "88", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Bhetariya To Safdarganj 1", "Beat id": "329", "Executive and PSR": "Saurabh Tripathi(SE)(600234)", "EXE ID": "88", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Bhetariya To Safdarganj 2", "Beat id": "330", "Executive and PSR": "Saurabh Tripathi(SE)(600234)", "EXE ID": "88", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Dariyabad To Barinbagh", "Beat id": "361", "Executive and PSR": "Saurabh Tripathi(SE)(600234)", "EXE ID": "88", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Dariyabad to Malinpur & Aliyabad", "Beat id": "936", "Executive and PSR": "Saurabh Tripathi(SE)(600234)", "EXE ID": "88", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Kasbaichawli to Netanpurwa", "Beat id": "938", "Executive and PSR": "Saurabh Tripathi(SE)(600234)", "EXE ID": "88", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Kotwa Dham To Kotwa sadak", "Beat id": "724", "Executive and PSR": "Saurabh Tripathi(SE)(600234)", "EXE ID": "88", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Mawai to Subeha & mau", "Beat id": "937", "Executive and PSR": "Saurabh Tripathi(SE)(600234)", "EXE ID": "88", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Miyaganj To Saidanpur", "Beat id": "723", "Executive and PSR": "Saurabh Tripathi(SE)(600234)", "EXE ID": "88", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Pokhra To Bachrawan Road", "Beat id": "444", "Executive and PSR": "Saurabh Tripathi(SE)(600234)", "EXE ID": "88", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Pokhra To Bilwar_Road", "Beat id": "445", "Executive and PSR": "Saurabh Tripathi(SE)(600234)", "EXE ID": "88", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Pokhra to Trivediganj", "Beat id": "939", "Executive and PSR": "Saurabh Tripathi(SE)(600234)", "EXE ID": "88", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Shadatganj To Badosarai", "Beat id": "475", "Executive and PSR": "Saurabh Tripathi(SE)(600234)", "EXE ID": "88", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Shadatganj To Ram Nagar", "Beat id": "476", "Executive and PSR": "Saurabh Tripathi(SE)(600234)", "EXE ID": "88", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Tikaitnagar To Bhadosarai 1", "Beat id": "491", "Executive and PSR": "Saurabh Tripathi(SE)(600234)", "EXE ID": "88", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Tikaitnagar To Bhadosarai 2", "Beat id": "492", "Executive and PSR": "Saurabh Tripathi(SE)(600234)", "EXE ID": "88", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Udhauli To Jaidpur 1", "Beat id": "497", "Executive and PSR": "Saurabh Tripathi(SE)(600234)", "EXE ID": "88", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Udhauli To Jaidpur 2", "Beat id": "498", "Executive and PSR": "Saurabh Tripathi(SE)(600234)", "EXE ID": "88", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Udhauli To Kotwa Sadak", "Beat id": "499", "Executive and PSR": "Saurabh Tripathi(SE)(600234)", "EXE ID": "88", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Alambagh to Mohaan road", "Beat id": "642", "Executive and PSR": "Bheem Singh Rathour(SE)(600247)", "EXE ID": "91", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Arjungunj to Gangaganj", "Beat id": "665", "Executive and PSR": "Bheem Singh Rathour(SE)(600247)", "EXE ID": "91", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Bijnor to Piparsand", "Beat id": "666", "Executive and PSR": "Bheem Singh Rathour(SE)(600247)", "EXE ID": "91", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Jehta to Atari", "Beat id": "663", "Executive and PSR": "Bheem Singh Rathour(SE)(600247)", "EXE ID": "91", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Lucknow to Gangaganj", "Beat id": "532", "Executive and PSR": "Bheem Singh Rathour(SE)(600247)", "EXE ID": "91", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Mohan Road to Malihabad", "Beat id": "677", "Executive and PSR": "Bheem Singh Rathour(SE)(600247)", "EXE ID": "91", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Telibagh to Nigoha", "Beat id": "530", "Executive and PSR": "Bheem Singh Rathour(SE)(600247)", "EXE ID": "91", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Babuganj To Umran", "Beat id": "270", "Executive and PSR": "Vicky Singh(SE)(600216)", "EXE ID": "94", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Civil Line To parsadhepur", "Beat id": "577", "Executive and PSR": "Vicky Singh(SE)(600216)", "EXE ID": "94", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Dalmau to Jagatpur", "Beat id": "356", "Executive and PSR": "Vicky Singh(SE)(600216)", "EXE ID": "94", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Dalmau to Lalganj", "Beat id": "357", "Executive and PSR": "Vicky Singh(SE)(600216)", "EXE ID": "94", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Dalmau to Raebareli", "Beat id": "358", "Executive and PSR": "Vicky Singh(SE)(600216)", "EXE ID": "94", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Dalmau to Sareni", "Beat id": "359", "Executive and PSR": "Vicky Singh(SE)(600216)", "EXE ID": "94", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Dalmau to Uchahar", "Beat id": "360", "Executive and PSR": "Vicky Singh(SE)(600216)", "EXE ID": "94", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Jagatpur To Suchi", "Beat id": "389", "Executive and PSR": "Vicky Singh(SE)(600216)", "EXE ID": "94", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Munsiganj to salon", "Beat id": "433", "Executive and PSR": "Vicky Singh(SE)(600216)", "EXE ID": "94", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Raebareli to Jagatpur", "Beat id": "449", "Executive and PSR": "Vicky Singh(SE)(600216)", "EXE ID": "94", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Raebareli to Maharajganj", "Beat id": "891", "Executive and PSR": "Vicky Singh(SE)(600216)", "EXE ID": "94", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Unchahar To Salon", "Beat id": "504", "Executive and PSR": "Vicky Singh(SE)(600216)", "EXE ID": "94", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Babhnan", "Beat id": "668", "Executive and PSR": "Akhilesh Kumar Pandey(SE)(600244)", "EXE ID": "156", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Chapiya", "Beat id": "670", "Executive and PSR": "Akhilesh Kumar Pandey(SE)(600244)", "EXE ID": "156", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Dumariya D to Motiganj", "Beat id": "554", "Executive and PSR": "Akhilesh Kumar Pandey(SE)(600244)", "EXE ID": "156", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Gonda to Balrampur", "Beat id": "556", "Executive and PSR": "Akhilesh Kumar Pandey(SE)(600244)", "EXE ID": "156", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Gonda to Cornelganj", "Beat id": "566", "Executive and PSR": "Akhilesh Kumar Pandey(SE)(600244)", "EXE ID": "156", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Gonda to Dhanepur", "Beat id": "603", "Executive and PSR": "Akhilesh Kumar Pandey(SE)(600244)", "EXE ID": "156", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Gonda to Itiyathok", "Beat id": "627", "Executive and PSR": "Akhilesh Kumar Pandey(SE)(600244)", "EXE ID": "156", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Gonda To Maskanwa", "Beat id": "646", "Executive and PSR": "Akhilesh Kumar Pandey(SE)(600244)", "EXE ID": "156", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Gonda To Paraspur", "Beat id": "604", "Executive and PSR": "Akhilesh Kumar Pandey(SE)(600244)", "EXE ID": "156", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Gonda To Sadar", "Beat id": "555", "Executive and PSR": "Akhilesh Kumar Pandey(SE)(600244)", "EXE ID": "156", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Gonda to Utraula", "Beat id": "580", "Executive and PSR": "Akhilesh Kumar Pandey(SE)(600244)", "EXE ID": "156", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Gourachouki", "Beat id": "669", "Executive and PSR": "Akhilesh Kumar Pandey(SE)(600244)", "EXE ID": "156", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Kudasan", "Beat id": "667", "Executive and PSR": "Akhilesh Kumar Pandey(SE)(600244)", "EXE ID": "156", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Machi Bazar (Mankapur)", "Beat id": "671", "Executive and PSR": "Akhilesh Kumar Pandey(SE)(600244)", "EXE ID": "156", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Tarabganj to Amdahi Paras", "Beat id": "591", "Executive and PSR": "Akhilesh Kumar Pandey(SE)(600244)", "EXE ID": "156", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Tarabganj To Dumariya D", "Beat id": "533", "Executive and PSR": "Akhilesh Kumar Pandey(SE)(600244)", "EXE ID": "156", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Tarabganj To Mankapur", "Beat id": "535", "Executive and PSR": "Akhilesh Kumar Pandey(SE)(600244)", "EXE ID": "156", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Tarabganj To Nawabganj", "Beat id": "534", "Executive and PSR": "Akhilesh Kumar Pandey(SE)(600244)", "EXE ID": "156", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Tarabganj to Pathari Bazar", "Beat id": "605", "Executive and PSR": "Akhilesh Kumar Pandey(SE)(600244)", "EXE ID": "156", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Tarabganj To Tulsipur", "Beat id": "647", "Executive and PSR": "Akhilesh Kumar Pandey(SE)(600244)", "EXE ID": "156", "PSR": "", "PSR ID": "", "ASM": "Ritik Singh"},
+{"Beat name": "Chand", "Beat id": "877", "Executive and PSR": "Dhananjay Kumar Singh(SE)(600257)", "EXE ID": "155", "PSR": "", "PSR ID": "", "ASM": "Shreshth Singh"},
+{"Beat name": "chandesh", "Beat id": "816", "Executive and PSR": "Dhananjay Kumar Singh(SE)(600257)", "EXE ID": "155", "PSR": "", "PSR ID": "", "ASM": "Shreshth Singh"},
+{"Beat name": "Karghar", "Beat id": "697", "Executive and PSR": "Dhananjay Kumar Singh(SE)(600257)", "EXE ID": "155", "PSR": "", "PSR ID": "", "ASM": "Shreshth Singh"},
+{"Beat name": "Mohaina", "Beat id": "832", "Executive and PSR": "Dhananjay Kumar Singh(SE)(600257)", "EXE ID": "155", "PSR": "", "PSR ID": "", "ASM": "Shreshth Singh"},
+{"Beat name": "Nouan to Devariya", "Beat id": "713", "Executive and PSR": "Dhananjay Kumar Singh(SE)(600257)", "EXE ID": "155", "PSR": "", "PSR ID": "", "ASM": "Shreshth Singh"},
+{"Beat name": "Nouan to Kochas", "Beat id": "738", "Executive and PSR": "Dhananjay Kumar Singh(SE)(600257)", "EXE ID": "155", "PSR": "", "PSR ID": "", "ASM": "Shreshth Singh"},
+{"Beat name": "Nouan to Ramgarh", "Beat id": "735", "Executive and PSR": "Dhananjay Kumar Singh(SE)(600257)", "EXE ID": "155", "PSR": "", "PSR ID": "", "ASM": "Shreshth Singh"},
+{"Beat name": "Nuaon to mohania", "Beat id": "851", "Executive and PSR": "Dhananjay Kumar Singh(SE)(600257)", "EXE ID": "155", "PSR": "", "PSR ID": "", "ASM": "Shreshth Singh"},
+{"Beat name": "Nuoan to Dinara", "Beat id": "695", "Executive and PSR": "Dhananjay Kumar Singh(SE)(600257)", "EXE ID": "155", "PSR": "", "PSR ID": "", "ASM": "Shreshth Singh"},
+{"Beat name": "Parsthua", "Beat id": "890", "Executive and PSR": "Dhananjay Kumar Singh(SE)(600257)", "EXE ID": "155", "PSR": "", "PSR ID": "", "ASM": "Shreshth Singh"},
+{"Beat name": "Rajpur", "Beat id": "876", "Executive and PSR": "Dhananjay Kumar Singh(SE)(600257)", "EXE ID": "155", "PSR": "", "PSR ID": "", "ASM": "Shreshth Singh"},
+{"Beat name": "Rampur Buxar", "Beat id": "733", "Executive and PSR": "Dhananjay Kumar Singh(SE)(600257)", "EXE ID": "155", "PSR": "", "PSR ID": "", "ASM": "Shreshth Singh"},
+{"Beat name": "Toparsathua", "Beat id": "854", "Executive and PSR": "Dhananjay Kumar Singh(SE)(600257)", "EXE ID": "155", "PSR": "", "PSR ID": "", "ASM": "Shreshth Singh"},
+
+    ];
+
+    function Calendar({ selectedDates, onDateSelect }) {
+      const [currentMonth, setCurrentMonth] = useState(new Date());
+
+      const getDaysInMonth = (date) => {
+        const year = date.getFullYear();
+        const month = date.getMonth();
+        const days = new Date(year, month + 1, 0).getDate();
+        return Array.from({ length: days }, (_, i) => new Date(year, month, i + 1));
+      };
+
+      const getFirstDayOfMonth = (date) => {
+        return new Date(date.getFullYear(), date.getMonth(), 1).getDay();
+      };
+
+      const daysInMonth = getDaysInMonth(currentMonth);
+      const firstDay = getFirstDayOfMonth(currentMonth);
+
+      const handlePrevMonth = () => {
+        setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1));
+      };
+
+      const handleNextMonth = () => {
+        setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1));
+      };
+
+      const formatDate = (date) => {
+        return date.toISOString().split('T')[0];
+      };
+
+      const isSelected = (date) => {
+        return selectedDates.includes(formatDate(date));
+      };
+
+      return (
+        <div className="bg-white p-4 rounded-lg shadow-md">
+          <div className="flex justify-between items-center mb-4">
+            <button
+              type="button"
+              onClick={handlePrevMonth}
+              className="text-indigo-600 hover:text-indigo-800"
+            >
+              ←
+            </button>
+            <span className="text-lg font-semibold text-gray-900">
+              {currentMonth.toLocaleString('default', { month: 'long', year: 'numeric' })}
+            </span>
+            <button
+              type="button"
+              onClick={handleNextMonth}
+              className="text-indigo-600 hover:text-indigo-800"
+            >
+              →
+            </button>
+          </div>
+          <div className="grid grid-cols-7 gap-1 text-center text-sm font-medium text-gray-600">
+            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+              <div key={day}>{day}</div>
+            ))}
+          </div>
+          <div className="grid grid-cols-7 gap-1 mt-2">
+            {Array(firstDay).fill(null).map((_, i) => (
+              <div key={`empty-${i}`} className="h-10"></div>
+            ))}
+            {daysInMonth.map((date, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => onDateSelect(formatDate(date))}
+                className={`h-10 rounded-full text-sm ${
+                  isSelected(date)
+                    ? 'bg-indigo-600 text-white'
+                    : 'bg-gray-100 text-gray-900 hover:bg-indigo-200'
+                }`}
+              >
+                {date.getDate()}
+              </button>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    function App() {
+      const [masterData, setMasterData] = useState(initialMasterData);
+      const [data, setData] = useState(null);
+      const [loading, setLoading] = useState(true);
+      const [asm, setAsm] = useState('');
+      const [type, setType] = useState('');
+      const [user, setUser] = useState('');
+      const [selectedDates, setSelectedDates] = useState([]);
+      const [selectedBeats, setSelectedBeats] = useState([]);
+      const [savedPlans, setSavedPlans] = useState([]);
+      const [newEntry, setNewEntry] = useState({
+        "Beat name": "",
+        "Beat id": "",
+        "Executive and PSR": "",
+        "EXE ID": "",
+        PSR: "",
+        "PSR ID": "",
+        ASM: "",
+      });
+      const [showMasterForm, setShowMasterForm] = useState(false);
+
+      useEffect(() => {
+        const processedData = processData(masterData);
+        setData(processedData);
+        setLoading(false);
+      }, [masterData]);
+
+      const processData = (rawData) => {
+        const asms = [...new Set(rawData.map(row => row.ASM).filter(Boolean))];
+        const executivesByAsm = {};
+        const psrsByAsm = {};
+        const beatsByExecutive = {};
+        const beatsByAsm = {};
+        const userIds = {};
+        // New mapping: PSR to their Executive
+        const psrToExecutive = {};
+
+        rawData.forEach(row => {
+          const asm = row.ASM;
+          const executive = row["Executive and PSR"];
+          const exeId = row["EXE ID"];
+          const psr = row.PSR;
+          const psrId = row["PSR ID"];
+          const beat = row["Beat name"];
+          const beatId = row["Beat id"];
+
+          if (!asm || !beat || !beatId) return;
+
+          if (executive && exeId) {
+            if (!executivesByAsm[asm]) executivesByAsm[asm] = new Set();
+            executivesByAsm[asm].add(executive);
+            if (!beatsByExecutive[executive]) beatsByExecutive[executive] = [];
+            beatsByExecutive[executive].push({ name: beat, id: beatId });
+            userIds[executive] = exeId;
+
+            // Map PSR to their Executive if PSR exists in this row
+            if (psr && psrId) {
+              psrToExecutive[psr] = executive;
+            }
+          }
+
+          if (psr && psrId) {
+            if (!psrsByAsm[asm]) psrsByAsm[asm] = new Set();
+            psrsByAsm[asm].add(psr);
+            userIds[psr] = psrId;
+          }
+
+          if (!beatsByAsm[asm]) beatsByAsm[asm] = [];
+          if (!beatsByAsm[asm].some(b => b.id === beatId)) {
+            beatsByAsm[asm].push({ name: beat, id: beatId });
+          }
+        });
+
+        return { asms, executivesByAsm, psrsByAsm, beatsByExecutive, beatsByAsm, userIds, psrToExecutive };
+      };
+
+      const handleAddEntry = (e) => {
+        e.preventDefault();
+        if (!newEntry["Beat name"] || !newEntry["Beat id"] || !newEntry.ASM) {
+          alert("Beat name, Beat ID, and ASM are required.");
+          return;
+        }
+        if (
+          (newEntry["Executive and PSR"] && !newEntry["EXE ID"]) ||
+          (!newEntry["Executive and PSR"] && newEntry["EXE ID"]) ||
+          (newEntry.PSR && !newEntry["PSR ID"]) ||
+          (!newEntry.PSR && newEntry["PSR ID"])
+        ) {
+          alert("Executive and PSR must have corresponding IDs if provided.");
+          return;
+        }
+        setMasterData([...masterData, { ...newEntry }]);
+        setNewEntry({
+          "Beat name": "",
+          "Beat id": "",
+          "Executive and PSR": "",
+          "EXE ID": "",
+          PSR: "",
+          "PSR ID": "",
+          ASM: "",
+        });
+      };
+
+      const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setNewEntry({ ...newEntry, [name]: value });
+      };
+
+      const handleDownloadMasterCSV = () => {
+        const csv = Papa.unparse(masterData);
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'Master_Data.csv';
+        link.click();
+      };
+
+      const handleDateSelect = (date) => {
+        if (selectedDates.includes(date)) {
+          setSelectedDates(selectedDates.filter(d => d !== date));
+        } else {
+          setSelectedDates([...selectedDates, date].sort());
+        }
+      };
+
+      const handleSaveBeat = () => {
+        if (selectedDates.length === 0 || selectedBeats.length === 0) {
+          alert("Please select at least one date and one beat.");
+          return;
+        }
+        const newPlans = selectedDates.map(date => ({
+          date,
+          beats: selectedBeats,
+          user: user,
+          userId: data.userIds[user],
+        }));
+        setSavedPlans([...savedPlans, ...newPlans]);
+        setSelectedDates([]);
+        setSelectedBeats([]);
+      };
+
+      const handleDownloadExcel = () => {
+        const worksheetData = savedPlans.flatMap(plan =>
+          plan.beats.map(beat => ({
+            date: plan.date,
+            beat_id: beat.id,
+            user_id: plan.userId,
+          }))
+        );
+
+        const ws = XLSX.utils.json_to_sheet(worksheetData);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Beat Plan");
+        XLSX.writeFile(wb, "Beat_Plan.xlsx");
+      };
+
+      const handleResetAllData = () => {
+        if (window.confirm("Are you sure you want to reset all data? This will clear the master data and saved plans.")) {
+          setMasterData(initialMasterData);
+          setSavedPlans([]);
+          setSelectedDates([]);
+          setSelectedBeats([]);
+          setAsm('');
+          setType('');
+          setUser('');
+          setShowMasterForm(false);
+          alert("All data has been reset to initial state.");
+        }
+      };
+
+      if (loading) {
+        return (
+          <div className="text-center text-2xl font-semibold text-gray-700">
+            Loading data...
+          </div>
+        );
+      }
+
+      // Updated logic for availableBeats
+      const availableBeats = type === 'Executive' && user && data.beatsByExecutive[user]
+        ? data.beatsByExecutive[user]
+        : type === 'PSR' && user && data.psrToExecutive[user] && data.beatsByExecutive[data.psrToExecutive[user]]
+        ? data.beatsByExecutive[data.psrToExecutive[user]]
+        : [];
+
+      return (
+        <div className="max-w-6xl mx-auto p-6 bg-white rounded-lg shadow-xl">
+          <h1 className="text-3xl font-bold text-center text-indigo-600 mb-6">
+            Beat Plan Selector with Master File
+          </h1>
+
+          <div className="mb-6">
+            <button
+              type="button"
+              onClick={handleResetAllData}
+              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+            >
+              Reset All Data
+            </button>
+          </div>
+
+          <div className="mb-6">
+           
+          </div>
+
+          {showMasterForm && (
+            <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">Manage Master Data</h2>
+              <form onSubmit={handleAddEntry} className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Beat Name</label>
+                    <input
+                      type="text"
+                      name="Beat name"
+                      value={newEntry["Beat name"]}
+                      onChange={handleInputChange}
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Beat ID</label>
+                    <input
+                      type="text"
+                      name="Beat id"
+                      value={newEntry["Beat id"]}
+                      onChange={handleInputChange}
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Executive Name</label>
+                    <input
+                      type="text"
+                      name="Executive and PSR"
+                      value={newEntry["Executive and PSR"]}
+                      onChange={handleInputChange}
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Executive ID</label>
+                    <input
+                      type="text"
+                      name="EXE ID"
+                      value={newEntry["EXE ID"]}
+                      onChange={handleInputChange}
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">PSR Name</label>
+                    <input
+                      type="text"
+                      name="PSR"
+                      value={newEntry.PSR}
+                      onChange={handleInputChange}
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">PSR ID</label>
+                    <input
+                      type="text"
+                      name="PSR ID"
+                      value={newEntry["PSR ID"]}
+                      onChange={handleInputChange}
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">ASM</label>
+                    <input
+                      type="text"
+                      name="ASM"
+                      value={newEntry.ASM}
+                      onChange={handleInputChange}
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                      required
+                    />
+                  </div>
+                </div>
+                <button
+                  type="submit"
+                  className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                >
+                  Add Entry
+                </button>
+              </form>
+
+              <div className="mt-6">
+                <h3 className="text-md font-semibold text-gray-900 mb-2">Current Master Data</h3>
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        {['Beat name', 'Beat id', 'Executive and PSR', 'EXE ID', 'PSR', 'PSR ID', 'ASM'].map(header => (
+                          <th key={header} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            {header}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {masterData.map((row, index) => (
+                        <tr key={index}>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{row["Beat name"]}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{row["Beat id"]}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{row["Executive and PSR"]}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{row["EXE ID"]}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{row.PSR}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{row["PSR ID"]}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{row.ASM}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <button
+                  onClick={handleDownloadMasterCSV}
+                  className="mt-4 w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                >
+                  Download Master Data as CSV
+                </button>
+              </div>
+            </div>
+          )}
+
+          <div className="space-y-6">
+            <h2 className="text-lg font-semibold text-gray-900">Beat Plan Selector</h2>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">ASM</label>
+              <select
+                value={asm}
+                onChange={(e) => {
+                  setAsm(e.target.value);
+                  setType('');
+                  setUser('');
+                  setSelectedBeats([]);
+                  setSelectedDates([]);
+                }}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              >
+                <option value="">Select ASM</option>
+                {data.asms.map((a) => (
+                  <option key={a} value={a}>{a}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Type</label>
+              <select
+                value={type}
+                onChange={(e) => {
+                  setType(e.target.value);
+                  setUser('');
+                  setSelectedBeats([]);
+                  setSelectedDates([]);
+                }}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                disabled={!asm}
+              >
+                <option value="">Select Type</option>
+                <option value="PSR">PSR</option>
+                <option value="Executive">Executive</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">PSR/Executive Name</label>
+              <select
+                value={user}
+                onChange={(e) => {
+                  setUser(e.target.value);
+                  setSelectedBeats([]);
+                  setSelectedDates([]);
+                }}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                disabled={!type}
+              >
+                <option value="">Select Name</option>
+                {asm && type === 'Executive' && data.executivesByAsm[asm] && [...data.executivesByAsm[asm]].map((exec) => (
+                  <option key={exec} value={exec}>{exec}</option>
+                ))}
+                {asm && type === 'PSR' && data.psrsByAsm[asm] && [...data.psrsByAsm[asm]].map((psr) => (
+                  <option key={psr} value={psr}>{psr}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Select Dates</label>
+              <Calendar
+                selectedDates={selectedDates}
+                onDateSelect={handleDateSelect}
+                disabled={!user}
+              />
+              {selectedDates.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {selectedDates.map((date) => (
+                    <span
+                      key={date}
+                      className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-indigo-100 text-indigo-800"
+                    >
+                      {date}
+                      <button
+                        type="button"
+                        onClick={() => handleDateSelect(date)}
+                        className="ml-2 text-indigo-600 hover:text-indigo-800"
+                      >
+                        ×
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Select Beats</label>
+              <select
+                multiple
+                value={selectedBeats.map(b => b.name)}
+                onChange={(e) => {
+                  const selectedNames = Array.from(e.target.selectedOptions).map(opt => opt.value);
+                  const selected = availableBeats.filter(b => selectedNames.includes(b.name));
+                  setSelectedBeats(selected);
+                }}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                disabled={!user || selectedDates.length === 0}
+              >
+                {availableBeats.map((beat) => (
+                  <option key={beat.id} value={beat.name}>{beat.name}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <button
+                type="button"
+                onClick={handleSaveBeat}
+                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                disabled={selectedDates.length === 0 || selectedBeats.length === 0}
+              >
+                Save Beat
+              </button>
+            </div>
+          </div>
+
+          {savedPlans.length > 0 && (
+            <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+              <h2 className="text-lg font-semibold text-gray-900">Saved Plans</h2>
+              {savedPlans.map((plan, index) => (
+                <div key={index} className="mt-2">
+                  <p><strong>Date:</strong> {plan.date}</p>
+                  <p><strong>User:</strong> {plan.user} (ID: {plan.userId})</p>
+                  <p><strong>Beats:</strong> {plan.beats.map(b => `${b.name} (${b.id})`).join(", ")}</p>
+                </div>
+              ))}
+              <button
+                onClick={handleDownloadExcel}
+                className="mt-4 w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              >
+                Download as Excel
+              </button>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
