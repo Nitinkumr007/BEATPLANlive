@@ -1130,10 +1130,14 @@
           }))
         );
 
+
         const ws = XLSX.utils.json_to_sheet(worksheetData, { header: ["SMID", "BEATID", "BEATPLANDATE"] });
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "Beat Plan");
-        XLSX.writeFile(wb, "Beat_Plan.xlsx");
+
+        // Modified to use the selected executive's name as the Excel file name, replacing spaces and special characters with underscores
+        const fileName = user ? `${user.replace(/[\s()]+/g, '_')}_Beat_Plan.xlsx` : 'Beat_Plan.xlsx';
+        XLSX.writeFile(wb, fileName);
       };
 
       const handleResetAllData = () => {
