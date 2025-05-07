@@ -1,11 +1,10 @@
 <!-- this program fix the excell download formats -->
+<!-- this code also contains PSR beats -->
 
 
 
 
 <!DOCTYPE html>
-
-
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -24,6 +23,8 @@
   <script type="text/babel">
     const { useState, useEffect } = React;
 
+    // Original master data
+   
     const initialMasterData = [{"Beat name": "Ballia mod To Ratanpura", "Beat id": "657", "Executive and PSR": "Ajay Singh(SE)(600192)", "EXE ID": "60", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
   {"Beat name": "Bhiti to Pipridih", "Beat id": "656", "Executive and PSR": "Ajay Singh(SE)(600192)", "EXE ID": "60", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
   {"Beat name": "Chowk to Kopaganj", "Beat id": "658", "Executive and PSR": "Ajay Singh(SE)(600192)", "EXE ID": "60", "PSR": "", "PSR ID": "", "ASM": "Amit Kumar Dubey"},
@@ -892,6 +893,49 @@
   {"Beat name": "Toparsathua", "Beat id": "854", "Executive and PSR": "Dhananjay Kumar Singh(SE)(600257)", "EXE ID": "155", "PSR": "", "PSR ID": "", "ASM": "Shreshth Singh"},
 
     ];
+    // PSR to Executive mapping from provided data
+    const psrToExecutiveData = [
+    {"PSR": "Nikhil Mishra(PSR034)", "PSR ID": "208", "Executive": "Ashish Mishra(SE)(600169)", "EXE ID": "170"},
+{"PSR": "Akhil Shukla(PSR)(GIPL013)", "PSR ID": "190", "Executive": "Ashwani Bajpai(SE)(600232)", "EXE ID": "68"},
+{"PSR": "Gajendra Singh(PSR040)", "PSR ID": "209", "Executive": "Nivesh Gupta(SE)(600201)", "EXE ID": "81"},
+{"PSR": "Akash kumar shukla(GIPL012)", "PSR ID": "219", "Executive": "Shailesh Kumar Pandey(SE)(600164)", "EXE ID": "90"},
+{"PSR": "Anoop Kumar(GIPL014)", "PSR ID": "213", "Executive": "Shailesh Kumar Pandey(SE)(600164)", "EXE ID": "90"},
+{"PSR": "Nirmal Shukla(GIPL011)", "PSR ID": "214", "Executive": "Shailesh Kumar Pandey(SE)(600164)", "EXE ID": "90"},
+{"PSR": "Kaushik Kumar (PSR044)", "PSR ID": "217", "Executive": "Satendra Pal(SE)(600272)", "EXE ID": "216"},
+{"PSR": "Situ Kumar(PSR016)", "PSR ID": "180", "Executive": "Abhishek Mishra(SE)(600221)", "EXE ID": "57"},
+{"PSR": "Gaurav Parsant Tiwari(PSR017)", "PSR ID": "181", "Executive": "Deepak Tomar(SE)(600203)", "EXE ID": "71"},
+{"PSR": "Shekhar Chaudhary (PSR028)", "PSR ID": "197", "Executive": "Deepak Tomar(SE)(600203)", "EXE ID": "71"},
+{"PSR": "Rohit Kumar(PSR018)", "PSR ID": "182", "Executive": "Gaurav Singh(SE)(600214)", "EXE ID": "73"},
+{"PSR": "Ashu Yadav(PSR020)", "PSR ID": "215", "Executive": "Sanjeev Kumar(SE)(600230)", "EXE ID": "87"},
+{"PSR": "Bhuvendra Singh(PSR019)", "PSR ID": "183", "Executive": "Sanjeev Kumar(SE)(600230)", "EXE ID": "87"},
+{"PSR": "Ankul singh(GIPL009)", "PSR ID": "220", "Executive": "Surya Prakash Awasthi (SE)(600249)", "EXE ID": "64"},
+{"PSR": "Saurabh Mishra(PSR025)", "PSR ID": "186", "Executive": "Surya Prakash Awasthi (SE)(600249)", "EXE ID": "64"},
+{"PSR": "Sushil singh(GIPL017)", "PSR ID": "221", "Executive": "Brijesh Kumar Pal(SE)(600140)", "EXE ID": "70"},
+{"PSR": "Mohit(PSR027)", "PSR ID": "188", "Executive": "Kushmesh Kumar(SE)(600237)", "EXE ID": "76"},
+{"PSR": "Yadvendra Kumar (PSR039)", "PSR ID": "223", "Executive": "Prem Kumar(SE)(600235)", "EXE ID": "84"},
+{"PSR": "Sanni Kumar Singh(PSR021)", "PSR ID": "185", "Executive": "Prem Kumar(SE)(600235)", "EXE ID": "84"},
+{"PSR": "Nandram Kushwah(PSR026)", "PSR ID": "187", "Executive": "Vimal Kumar Singh(SE)(600227)", "EXE ID": "98"},
+{"PSR": "Yogendra pal(PSR023)", "PSR ID": "189", "Executive": "Vivek Singh(SE)(600228)", "EXE ID": "100"},
+{"PSR": "Abhishek Singh (PSR031)", "PSR ID": "222", "Executive": "Kamlesh Katheria(SE)(600267)", "EXE ID": "173"},
+{"PSR": "Harikash Singh Yadav(PSR037)", "PSR ID": "224", "Executive": "Amit Kumar Singh(SE)(600179)", "EXE ID": "63"},
+{"PSR": "Sonu Kumar Gupta(PSR045)", "PSR ID": "218", "Executive": "Arun Yadav(SE)(600213)", "EXE ID": "66"},
+{"PSR": "Shivam Dubey(PSR011)", "PSR ID": "204", "Executive": "Pradeep Verma(SE)(600184)", "EXE ID": "82"},
+{"PSR": "Gaurav Verma (GIPL007)", "PSR ID": "203", "Executive": "Vikas Singh(SE)(600134)", "EXE ID": "97"},
+{"PSR": "Monu(PSR036)", "PSR ID": "205", "Executive": "Aditya Sah(SE)(600183)", "EXE ID": "59"},
+{"PSR": "Arvind kumar (PSR010)", "PSR ID": "206", "Executive": "Anadi Krishn(SE)(600163)", "EXE ID": "65"},
+{"PSR": "Shivam Singh(PSR009)", "PSR ID": "207", "Executive": "Prashant Singh(SE)(600178)", "EXE ID": "83"},
+{"PSR": "Kamlesh Kumar Pandey(PSR004)", "PSR ID": "201", "Executive": "Rana Singh(SE)(600207)", "EXE ID": "86"},
+{"PSR": "Sunil Kumar Yadav (GIPL019)", "PSR ID": "199", "Executive": "Vikas Kumar Verma(SE)(600088)", "EXE ID": "96"},
+{"PSR": "Sudheer Kumar(PSR046)", "PSR ID": "225", "Executive": "Vikas Kumar Verma(SE)(600088)", "EXE ID": "96"},
+{"PSR": "Ram Mohan Upadhyay(PSR012)", "PSR ID": "193", "Executive": "Akhilesh Kumar Pandey(SE)(600244)", "EXE ID": "156"},
+{"PSR": "Arvind Kumar Sidadhart (PSR006)", "PSR ID": "191", "Executive": "Abhay Tiwari(SE)(600188)", "EXE ID": "56"},
+{"PSR": "Rajeev Kumar Tripathi(GIPL018)", "PSR ID": "196", "Executive": "Harshit Julius(SE)(600168)", "EXE ID": "75"},
+{"PSR": "Amar Pratap Singh(GIPL010)", "PSR ID": "195", "Executive": "Saurabh Tripathi(SE)(600234)", "EXE ID": "88"},
+{"PSR": "Kamlakant (GIPL006)", "PSR ID": "194", "Executive": "Saurabh Tripathi(SE)(600234)", "EXE ID": "88"},
+{"PSR": "Alok kumar Singh(PSR007)", "PSR ID": "169", "Executive": "Bheem Singh Rathour(SE)(600247)", "EXE ID": "91"},
+
+
+    ];
 
     function Calendar({ selectedDates, onDateSelect }) {
       const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -998,12 +1042,17 @@
       const [showMasterForm, setShowMasterForm] = useState(false);
 
       useEffect(() => {
-        const processedData = processData(masterData);
-        setData(processedData);
-        setLoading(false);
+        try {
+          const processedData = processData(masterData, psrToExecutiveData);
+          setData(processedData);
+          setLoading(false);
+        } catch (error) {
+          console.error("Error processing data:", error);
+          alert("An error occurred while processing data. Please check the console for details.");
+        }
       }, [masterData]);
 
-      const processData = (rawData) => {
+      const processData = (rawData, psrData) => {
         const asms = [...new Set(rawData.map(row => row.ASM).filter(Boolean))];
         const executivesByAsm = {};
         const psrsByAsm = {};
@@ -1012,6 +1061,7 @@
         const userIds = {};
         const psrToExecutive = {};
 
+        // Process original master data
         rawData.forEach(row => {
           const asm = row.ASM;
           const executive = row["Executive and PSR"];
@@ -1021,7 +1071,10 @@
           const beat = row["Beat name"];
           const beatId = row["Beat id"];
 
-          if (!asm || !beat || !beatId) return;
+          if (!asm || !beat || !beatId) {
+            console.warn("Skipping invalid row in master data:", row);
+            return;
+          }
 
           if (executive && exeId) {
             if (!executivesByAsm[asm]) executivesByAsm[asm] = new Set();
@@ -1032,18 +1085,48 @@
 
             if (psr && psrId) {
               psrToExecutive[psr] = executive;
+              if (!psrsByAsm[asm]) psrsByAsm[asm] = new Set();
+              psrsByAsm[asm].add(psr);
+              userIds[psr] = psrId;
             }
-          }
-
-          if (psr && psrId) {
-            if (!psrsByAsm[asm]) psrsByAsm[asm] = new Set();
-            psrsByAsm[asm].add(psr);
-            userIds[psr] = psrId;
           }
 
           if (!beatsByAsm[asm]) beatsByAsm[asm] = [];
           if (!beatsByAsm[asm].some(b => b.id === beatId)) {
             beatsByAsm[asm].push({ name: beat, id: beatId });
+          }
+        });
+
+        // Integrate PSR to Executive mappings
+        psrData.forEach(row => {
+          const psr = row.PSR;
+          const psrId = row["PSR ID"];
+          const executive = row.Executive;
+          const exeId = row["EXE ID"];
+          const asm = rawData.find(r => r["Executive and PSR"] === executive)?.ASM || "Amit Kumar Dubey";
+
+          if (!psr || !psrId || !executive || !exeId) {
+            console.warn("Skipping invalid PSR data:", row);
+            return;
+          }
+
+          psrToExecutive[psr] = executive;
+          if (!psrsByAsm[asm]) psrsByAsm[asm] = new Set();
+          psrsByAsm[asm].add(psr);
+          userIds[psr] = psrId;
+          userIds[executive] = exeId;
+
+          if (!executivesByAsm[asm]) executivesByAsm[asm] = new Set();
+          executivesByAsm[asm].add(executive);
+
+          // Initialize beats for executive if not already present
+          if (!beatsByExecutive[executive]) {
+            beatsByExecutive[executive] = rawData
+              .filter(r => r["Executive and PSR"] === executive)
+              .map(r => ({ name: r["Beat name"], id: r["Beat id"] }));
+            if (beatsByExecutive[executive].length === 0) {
+              console.warn(`No beats found for executive: ${executive}`);
+            }
           }
         });
 
@@ -1108,7 +1191,7 @@
           date,
           beats: selectedBeats,
           user: user,
-          userId: data.userIds[user],
+          userId: data.userIds[user] || 'Unknown',
         }));
         setSavedPlans([...savedPlans, ...newPlans]);
         setSelectedDates([]);
@@ -1126,16 +1209,13 @@
             SMID: plan.userId,
             BEATID: beat.id,
             BEATPLANDATE: formatDateToDDMMYYYY(plan.date),
-            
           }))
         );
-
 
         const ws = XLSX.utils.json_to_sheet(worksheetData, { header: ["SMID", "BEATID", "BEATPLANDATE"] });
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "Beat Plan");
 
-        // Modified to use the selected executive's name as the Excel file name, replacing spaces and special characters with underscores
         const fileName = user ? `${user.replace(/[\s()]+/g, '_')}_Beat_Plan.xlsx` : 'Beat_Plan.xlsx';
         XLSX.writeFile(wb, fileName);
       };
@@ -1171,8 +1251,12 @@
       return (
         <div className="max-w-6xl mx-auto p-6 bg-white rounded-lg shadow-xl">
           <h1 className="text-3xl font-bold text-center text-indigo-600 mb-6">
-           Unatti Beat Plan Selector 
+            Beat Plan Selector
           </h1>
+
+          <div className="mb-6">
+
+          </div>
 
           <div className="mb-6">
             <button
@@ -1402,6 +1486,9 @@
 
             <div>
               <label className="block text-sm font-medium text-gray-700">Select Beats</label>
+              {availableBeats.length === 0 && user && (
+                <p className="text-sm text-red-600">No beats available for this user.</p>
+              )}
               <select
                 multiple
                 value={selectedBeats.map(b => b.name)}
@@ -1411,7 +1498,7 @@
                   setSelectedBeats(selected);
                 }}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                disabled={!user || selectedDates.length === 0}
+                disabled={!user || selectedDates.length === 0 || availableBeats.length === 0}
               >
                 {availableBeats.map((beat) => (
                   <option key={beat.id} value={beat.name}>{beat.name}</option>
